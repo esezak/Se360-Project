@@ -3,7 +3,7 @@ import java.io.*;
 import java.net.*;
 public class Connector {
     public static void main(String[] args) {
-        String hostname = "localhost";
+        String hostname = "raspberry";
         int port = 12345;
 
         try (Socket socket = new Socket(hostname, port)) {

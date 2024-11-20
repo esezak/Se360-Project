@@ -29,13 +29,17 @@ public class ClientMainWindow {
         setBottomPanel();
         setCenterPanel();
     }
+
+    /**
+     * creates asdasd
+     */
     private void setFrame(){
         frame = new JFrame();
         frame.setSize(1280, 720);
         frame.setTitle("Client UI");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.setResizable(true);
+        //frame.setLocationRelativeTo(null);
+        //frame.setResizable(true);
         frame.setLayout(new BorderLayout(5,5));
         frame.getContentPane().setBackground(Color.DARK_GRAY);
         frame.setVisible(true);
@@ -113,6 +117,12 @@ public class ClientMainWindow {
         bottomPanel.setBackground(Color.GRAY);
         frame.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
     }
+
+    /**
+     * @param text
+     * asd asd as dsa da dsa dsadasdas
+     * @return button
+     */
     private JButton createButton(String text){
         JButton button = new JButton(text);
         button.setFocusable(false);
