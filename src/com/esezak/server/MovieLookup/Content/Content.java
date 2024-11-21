@@ -1,6 +1,8 @@
 package com.esezak.server.MovieLookup.Content;
 
-public class Content {
+import java.io.Serializable;
+
+public class Content implements Serializable {
     private final String id;
     private final String title;
     private final String release_date;

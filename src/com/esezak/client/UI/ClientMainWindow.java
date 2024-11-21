@@ -15,7 +15,7 @@ public class ClientMainWindow {
     private final Insets buttonMargins = new Insets(3, 20, 3, 20);
     private JTextField ipTextField;
     private JTextField usernameTextField;
-    private JTextField passwordTextField;
+    private JPasswordField passwordTextField;
 
 
     public ClientMainWindow() {
@@ -89,19 +89,21 @@ public class ClientMainWindow {
         gbc.gridx = 0;gbc.gridy++;
         rightPanel.add(createLabel("Password:"), gbc);
         gbc.gridx++;
-        passwordTextField = createTextField(passwordTextField);
+        passwordTextField = createPasswordField(passwordTextField);
         rightPanel.add(passwordTextField, gbc);
         gbc.gridx = 0;gbc.gridy++;
 
         //Server Ip
+        /*
         rightPanel.add(createLabel("Server Ip: "),gbc);
         gbc.gridx++;
         ipTextField = createTextField(ipTextField);
         rightPanel.add(ipTextField,gbc);
+        */
 
         //Connect Disconnect Buttons
         gbc.gridx = 0;gbc.gridy++;
-        rightPanel.add(createConnectButton("Connect", ipTextField),gbc);
+        rightPanel.add(createConnectButton("Connect"),gbc);
         gbc.gridx++;
         rightPanel.add(createButton("Disconnect"),gbc);
         gbc.gridy++; gbc.gridx = 0;
@@ -118,10 +120,10 @@ public class ClientMainWindow {
         frame.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
     }
 
+
     /**
-     * @param text
-     * asd asd as dsa da dsa dsadasdas
-     * @return button
+     * @param text text label for the button
+     * @return a template button object
      */
     private JButton createButton(String text){
         JButton button = new JButton(text);
@@ -134,14 +136,18 @@ public class ClientMainWindow {
         });
         return button;
     }
-    private JButton createConnectButton(String text, JTextField textField){
+    /**
+     * @param text text label for the button
+     * @return a template button object
+     */
+    private JButton createConnectButton(String text){
         JButton button = new JButton(text);
         button.setFocusable(false);
         button.setFont(globalFont);
         button.setMargin(buttonMargins);
         button.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         button.addActionListener(e -> {
-            System.out.println(textField.getText());
+            System.out.println(this.connectionStatusLabel.getText());
             connectionStatusLabel.setText("Connecting");
         });
         return button;
@@ -171,5 +177,11 @@ public class ClientMainWindow {
         textField.setFont(globalFont);
         //ipTextField.getBaseline(10, 10);
         return textField;
+    }
+    private JPasswordField createPasswordField(JPasswordField passwordField){
+        passwordField = new JPasswordField(10);
+        passwordField.setFont(globalFont);
+        //ipTextField.getBaseline(10, 10);
+        return passwordField;
     }
 }
