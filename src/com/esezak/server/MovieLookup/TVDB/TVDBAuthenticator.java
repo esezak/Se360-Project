@@ -1,4 +1,4 @@
-package com.esezak.server.MovieLookup;
+package com.esezak.server.MovieLookup.TVDB;
 
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
