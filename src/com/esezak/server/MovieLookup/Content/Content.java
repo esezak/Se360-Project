@@ -64,6 +64,7 @@ public class Content implements Serializable {
     }
     public void addRating(float newRating) {
         this.total_rating += newRating;
+        this.nuber_of_reviews++;
         this.avg_rating += this.total_rating/this.nuber_of_reviews;
     }
 
