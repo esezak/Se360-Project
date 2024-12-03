@@ -1,4 +1,4 @@
-package com.esezak.server.Database.Connect;
+package com.esezak.server.Database.Init;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;

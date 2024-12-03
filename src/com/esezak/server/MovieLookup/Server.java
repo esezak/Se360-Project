@@ -34,17 +34,21 @@ public class Server {
         }
 
         public void run() {
-            try (InputStream input = socket.getInputStream();//gets input from client
-                 BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+            try (ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
                  ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());){
 
-                String filmName = reader.readLine();
-                ArrayList<Content> data = TVDBSearcher.queryFromTVDB(filmName, ContentType.movie);
-                output.writeObject(data);
+
+                Content data = (Content)input.readObject();
+                data.displayContent();
+                //String filmName = input.readLine();
+                //ArrayList<Content> data = TVDBSearcher.queryFromTVDB(filmName, ContentType.movie);
+                //output.writeObject(data);
                 System.out.println("Data sent to client");
             } catch (IOException ex) {
                 System.out.println("Server exception: " + ex.getMessage());
                 ex.printStackTrace();
+            } catch (Error | ClassNotFoundException e){
+                System.out.println("Server exception: " + e.getMessage());
             }
         }
     }

@@ -1,5 +1,4 @@
 package com.esezak.server.Database.Init;
-import com.esezak.server.Database.Connect.ConnectDB;
 import java.sql.*;
 
 public class DB_Init {
@@ -18,9 +17,9 @@ public class DB_Init {
 
                 String createMoviesTable = """
             CREATE TABLE IF NOT EXISTS Movies (
-                movie_id INTEGER PRIMARY KEY,
+                movie_id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
-                release_year INTEGER,
+                release_year TEXT NOT NULL,
                 genre TEXT,
                 director TEXT,
                 overview TEXT,
