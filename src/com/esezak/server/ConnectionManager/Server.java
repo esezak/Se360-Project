@@ -30,23 +30,9 @@ public class Server {
             this.socket = socket;
         }
 
+        //TODO make it handle different requests
         public void run() {
-            try (ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
-                 ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());){
 
-
-                Content data = (Content)input.readObject();
-                data.displayContent();
-                //String filmName = input.readLine();
-                //ArrayList<Content> data = TVDBSearcher.queryFromTVDB(filmName, ContentType.movie);
-                //output.writeObject(data);
-                System.out.println("Data sent to client");
-            } catch (IOException ex) {
-                System.out.println("Server exception: " + ex.getMessage());
-                ex.printStackTrace();
-            } catch (Error | ClassNotFoundException e){
-                System.out.println("Server exception: " + e.getMessage());
-            }
         }
     }
 }

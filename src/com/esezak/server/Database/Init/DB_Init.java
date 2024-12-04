@@ -1,8 +1,15 @@
 package com.esezak.server.Database.Init;
+import org.apache.http.annotation.Obsolete;
+
 import java.sql.*;
 
+@Deprecated(forRemoval = true)
 public class DB_Init {
     public static void main(String[] args) {
+        //TODO----------------------------------
+        /*
+        Bu classa gerek var mı yandaki menüden tablelar ayarlanabiliyor.
+         */
         ConnectDB db = new ConnectDB();
         Connection connection = db.getConnection();
         if (connection != null) {
