@@ -11,7 +11,7 @@ public class DB {
     private static final String DB_PASSWORD = " ";
 
     public static void addToDatabase(Content content) {
-        String query = "INSERT INTO Movies (movie_id, title, release_year, genre, director, overview, image_url,rating) "
+        String query = "INSERT INTO Movies (movie_id, title, release_year, genre, director, overview, image_url,avg_rating) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?) ";
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             if(!isDuplicate(connection,content)){

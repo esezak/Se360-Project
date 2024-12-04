@@ -1,6 +1,7 @@
 package com.esezak.server.MovieLookup.Content;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Content implements Serializable {
     private final String id;
@@ -11,7 +12,7 @@ public class Content implements Serializable {
     private final String overview;
     private final String image_url;
     private float avg_rating;
-    private float total_rating;
+    private int total_rating;
     private int nuber_of_reviews;
 
     public Content(String id, String title, String image_url, String overview, String release_date, String genres, String director) {
@@ -62,10 +63,23 @@ public class Content implements Serializable {
     public float getAvg_rating() {
         return avg_rating;
     }
-    public void addRating(float newRating) {
+    private void calcAverageRating() {
+        this.avg_rating += (float)this.total_rating/(float)this.nuber_of_reviews;
+    }
+    public void addRating(int newRating) {
         this.total_rating += newRating;
         this.nuber_of_reviews++;
-        this.avg_rating += this.total_rating/this.nuber_of_reviews;
+        calcAverageRating();
+    }
+    public void updateRating(int oldRating, int newRating) {
+        this.total_rating -= oldRating;
+        this.total_rating += newRating;
+        calcAverageRating();
+    }
+    public void deleteRating(int rating) {
+        this.total_rating -= rating;
+        this.nuber_of_reviews--;
+        calcAverageRating();
     }
 
 }

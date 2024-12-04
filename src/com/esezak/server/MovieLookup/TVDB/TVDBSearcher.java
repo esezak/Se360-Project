@@ -54,7 +54,9 @@ public class TVDBSearcher {
             String id = item.getString("id");
             String title = item.getString("name");
             String releaseYear = item.optString("year", "TBA");
-            String genres = item.optJSONArray("genres").toString();
+            String genres = "unknown";
+            if(item.optJSONArray("genres")!=null)
+                genres = item.optJSONArray("genres").toString();
             String director = item.optString("director", "Not Known");
             String overview = item.optString("overview", "Not Known");
             String imageUrl = item.optString("image_url", "");
@@ -73,7 +75,7 @@ public class TVDBSearcher {
     }
 
     public static void main(String[] args) {
-        ArrayList<Content> movieContents = TVDBSearcher.queryFromTVDB("Breaking Bad", ContentType.movie);
+        ArrayList<Content> movieContents = TVDBSearcher.queryFromTVDB("Star Wars", ContentType.movie);
         if (movieContents != null) {
             for (Content content : movieContents) {
                 content.displayContent();

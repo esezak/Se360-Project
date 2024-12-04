@@ -1,13 +1,10 @@
-package com.esezak.server.MovieLookup;
+package com.esezak.server.ConnectionManager;
 
 import com.esezak.server.MovieLookup.Content.Content;
-import com.esezak.server.MovieLookup.Content.ContentType;
-import com.esezak.server.MovieLookup.TVDB.TVDBSearcher;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 
 public class Server {
     public static void main(String[] args) {
