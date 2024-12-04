@@ -2,7 +2,9 @@ package com.esezak.client.ConnectionManager.Requests;
 
 import com.esezak.server.MovieLookup.Content.Review;
 
-public class UserRequest extends Request {
+import java.io.Serializable;
+
+public class UserRequest extends Request implements Serializable {
     private String username;
     private String password;
     private String movieID;

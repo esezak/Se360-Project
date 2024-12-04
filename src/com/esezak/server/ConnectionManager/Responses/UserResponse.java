@@ -2,9 +2,10 @@ package com.esezak.server.ConnectionManager.Responses;
 
 import com.esezak.server.MovieLookup.Content.Content;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class UserResponse extends Response{
+public class UserResponse extends Response implements Serializable {
     private ArrayList<Content> watchlist = null;
     public UserResponse(boolean status) {
         super(status);
