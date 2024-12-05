@@ -123,7 +123,7 @@ public class ConnectionThread extends Thread {
      * @throws IOException
      */
     private void sendOkResponse() throws IOException {
-        System.err.println("Sent ok response");
+        System.out.println("Sent ok response");
         currentResponse = new Response(true);
         sendChannel.writeObject(currentResponse);
     }
