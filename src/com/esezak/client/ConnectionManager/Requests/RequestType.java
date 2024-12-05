@@ -7,17 +7,17 @@ public enum RequestType {
             //Send -> Username + Password + Request Type
             // Response -> ok | fail
             LOGOUT,
-            //Send -> Username + Password + Request Type
+            //Send -> Request Type
             // Response -> ok | fail
             GET_USER_WATCHLIST,
-            //Send -> Username + Password + Request Type
-            // Response -> ArrayList<Content> ok | fail
+            //Send -> Request Type
+            // Response -> ArrayList<Content> ok | fail if not logged in
             ADD_MOVIE_TO_WATCHLIST,
-            //Send -> Username + Password + Request Type + "MovieID"
-            //Response -> ok | fail
+            //Send -> Request Type + "MovieID"
+            //Response -> ok | fail if not logged in
             RATE_MOVIE,
-            //Send -> Username + Password + Request Type + "MovieID" + Review
-            //Response -> ok | fail
+            //Send -> Request Type + "MovieID" + Review
+            //Response -> ok | fail if not logged in
 
         //TODO Movie Requests
         SEARCH_MOVIE,

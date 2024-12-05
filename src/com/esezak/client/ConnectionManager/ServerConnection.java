@@ -15,7 +15,7 @@ public class ServerConnection {
     ArrayList<Content> userWatchlist;
     Request currentRequest;
     ObjectOutputStream sendChannel;
-    ObjectInputStream recieveChannel;
+    ObjectInputStream receiveChannel;
     public ServerConnection(String host, int port) {
         this.host = host;
         this.port = port;
@@ -24,7 +24,7 @@ public class ServerConnection {
         try{
             connection = new Socket(this.host,this.port);
             sendChannel = new ObjectOutputStream(connection.getOutputStream());
-            recieveChannel = new ObjectInputStream(connection.getInputStream());
+            receiveChannel = new ObjectInputStream(connection.getInputStream());
             return true;
         } catch (IOException e) {
             System.err.println("Could not connect to server");
@@ -56,7 +56,7 @@ public class ServerConnection {
             sendChannel.writeObject(request);
 
             //receive request from server
-            response = (UserResponse) recieveChannel.readObject();
+            response = (UserResponse) receiveChannel.readObject();
             if(!response.getStatus()){
                 System.out.println("Request failed");
                 return false;
@@ -81,7 +81,7 @@ public class ServerConnection {
             //Send request to server
             sendChannel.writeObject(request);
             //receive request from server
-            response = (UserResponse) recieveChannel.readObject();
+            response = (UserResponse) receiveChannel.readObject();
             if(!response.getStatus()){
                 System.out.println("Request failed");
                 return false;
