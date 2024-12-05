@@ -4,22 +4,23 @@ public enum RequestType {
     //Requests
         //User Requests
             LOGIN,
-            //Send -> Username + Password + Request Type
+            //Send -> Username + Password + Request type  (post)
             // Response -> ok | fail
             LOGOUT,
-            //Send -> Request Type
+            //Send -> Request Type (get)
+            // Response -> ok | fail
+            DISCONNECT,
+            //Send -> Request Type (get)
             // Response -> ok | fail
             GET_USER_WATCHLIST,
-            //Send -> Request Type
+            //Send -> Request Type (get)
             // Response -> ArrayList<Content> ok | fail if not logged in
             ADD_MOVIE_TO_WATCHLIST,
-            //Send -> Request Type + "MovieID"
+            //Send -> Request Type + "MovieID" (post)
             //Response -> ok | fail if not logged in
             RATE_MOVIE,
-            //Send -> Request Type + "MovieID" + Review
+            //Send -> Request Type + "MovieID" + Review (post)
             //Response -> ok | fail if not logged in
-
-        //TODO Movie Requests
         SEARCH_MOVIE,
         //Send -> "Movie name"
         // Response -> ArrayList<Content> ok | fail
