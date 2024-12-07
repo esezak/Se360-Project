@@ -8,8 +8,8 @@ import java.net.*;
 import java.util.ArrayList;
 
 public class ServerConnection {
-    private String host = "localhost";
-    private int port = 12345;
+    private String host;
+    private int port;
     private Socket connection = null;
     public ArrayList<Content> userWatchlist;
     public Request currentRequest;
@@ -19,16 +19,16 @@ public class ServerConnection {
         this.host = host;
         this.port = port;
         currentRequest = new Request();
-        setConnection();
     }
-    private boolean setConnection(){
+    public boolean setConnection(){
         try{
             connection = new Socket(this.host,this.port);
             sendChannel = new ObjectOutputStream(connection.getOutputStream());
             receiveChannel = new ObjectInputStream(connection.getInputStream());
+
             return true;
         } catch (IOException e) {
-            System.err.println("Could not connect to server");
+
             return false;
         }
     }
@@ -38,7 +38,7 @@ public class ServerConnection {
      * Request types: LOGIN, LOGOUT, DISCONNECT, GET_USER_WATCHLIST, ADD_MOVIE_TO_WATCHLIST
      * @return true if request is successful
      */
-    private void sendSimpleRequest(Request request){
+    private boolean sendSimpleRequest(Request request){
         currentRequest = request;
         Response response;
         try{
@@ -49,16 +49,20 @@ public class ServerConnection {
             response = (Response) receiveChannel.readObject();
             if(!response.getStatus()){
                 System.err.println("Request failed");
+                return false;
             }else{
                 System.out.println(currentRequest.getRequestType()+" Successfully Sent");
             }
             if(response.getWatchlist()!=null){
                 userWatchlist = response.getWatchlist();
             }
+            return true;
         } catch (IOException e) {
             System.err.println("Could not send "+ currentRequest.getRequestType() +" request");
+            return false;
         } catch (ClassNotFoundException e) {
             System.err.println("Received class not found");
+            return false;
         }
     }
 
@@ -80,6 +84,17 @@ public class ServerConnection {
             return false;
         }
     }
+    public boolean sendDisconnectRequest(){
+        currentRequest = new Request();
+        currentRequest.disconnect();
+        return sendSimpleRequest(currentRequest);
+    }
+    public boolean sendLogoutRequest(){
+        currentRequest = new Request();
+        currentRequest.logout();
+        return sendSimpleRequest(currentRequest);
+    }
+
     public static void main (String[] args) {//Connection tests
         ServerConnection serverConnection = new ServerConnection("localhost", 12345);
         Request request = new Request();
