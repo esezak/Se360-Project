@@ -28,11 +28,12 @@ public class ClientMainWindow {
     }
     private void initialize() {
         setFrame();
+        setCenterPanel();
+        setTopPanel();
         setLeftPanel();
         setRightPanel();
-        setTopPanel();
         setBottomPanel();
-        setCenterPanel();
+
     }
     private void setFrame(){
         frame = new JFrame();
@@ -45,15 +46,13 @@ public class ClientMainWindow {
         frame.getContentPane().setBackground(Color.DARK_GRAY);
         frame.setVisible(true);
     }
-
+    private void setTopPanel(){
+        topPanel = new TopPanel(centerPanel);
+        frame.getContentPane().add(topPanel.getPanel(), BorderLayout.NORTH);
+    }
     private void setCenterPanel(){
         centerPanel = new CenterPanel();
-        frame.getContentPane().add(centerPanel.getPanel(), BorderLayout.CENTER);
-    }
-
-    private void setTopPanel(){
-        topPanel = new TopPanel();
-        frame.getContentPane().add(topPanel.getPanel(), BorderLayout.NORTH);
+        frame.getContentPane().add(centerPanel.getScrollPane(), BorderLayout.CENTER);
     }
 
     private void setLeftPanel(){

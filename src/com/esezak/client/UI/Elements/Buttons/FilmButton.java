@@ -6,9 +6,12 @@ public class FilmButton extends SimpleButton {
     ImageIcon icon;
     public FilmButton(String filmName, String iconPath) {
         super(filmName);
-        icon = new ImageIcon(iconPath);
-        button.setIcon(icon);
+        //icon = new ImageIcon(iconPath);
+        //button.setIcon(icon);
         button.setVerticalTextPosition(SwingConstants.BOTTOM);
         button.setHorizontalTextPosition(SwingConstants.CENTER);
+        button.addActionListener(e -> {
+            System.out.println("Display Film");
+        });
     }
 }

@@ -11,4 +11,11 @@ public abstract class SimpleTextField {
         textField.setEditable(true);
         textField.setFont(GLOBAL_FONT);
     }
+
+    public JTextField getTextField() {
+        return textField;
+    }
+    public String getText() {
+        return textField.getText();
+    }
 }
