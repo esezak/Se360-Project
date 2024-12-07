@@ -1,5 +1,5 @@
 package com.esezak.server.MovieLookup.TVDB;
-import com.esezak.server.Database.Management.DB;
+import com.esezak.server.Database.Management.DBConnection;
 import com.esezak.server.MovieLookup.Content.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.*;
@@ -23,6 +23,7 @@ public class TVDBSearcher {
      */
     public static ArrayList<Content> queryFromTVDB(String contentName, ContentType contentType) {
         ArrayList<Content> contents = null;
+        DBConnection dbConnection = new DBConnection();
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet request = new HttpGet(API_URL + "/search?query=" + stringParser(contentName) + "&type=" + contentType.toString());
             request.setHeader("accept", "application/json");
@@ -32,7 +33,7 @@ public class TVDBSearcher {
                 if (response.getStatusLine().getStatusCode() == 200) {
                     contents = parseJson(EntityUtils.toString(response.getEntity()), contentType);
                     for (Content content : contents) {
-                        DB.addToDatabase(content);
+                        dbConnection.addToDatabase(content);
                     }
                 } else {
                     System.err.println("Error: " + response.getStatusLine().getStatusCode());

@@ -47,7 +47,7 @@ public class ClientMainWindow {
         frame.setVisible(true);
     }
     private void setTopPanel(){
-        topPanel = new TopPanel(centerPanel);
+        topPanel = new TopPanel(centerPanel,connection);
         frame.getContentPane().add(topPanel.getPanel(), BorderLayout.NORTH);
     }
     private void setCenterPanel(){
@@ -60,7 +60,7 @@ public class ClientMainWindow {
         frame.add(leftPanel.getPanel(), BorderLayout.WEST);
     }
     private void setRightPanel(){
-        rightPanel = new RightPanel(connection);
+        rightPanel = new RightPanel(connection,topPanel,leftPanel);
         frame.getContentPane().add(rightPanel.getPanel(), BorderLayout.EAST);
     }
 

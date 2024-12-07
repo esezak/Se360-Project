@@ -8,9 +8,9 @@ import java.awt.*;
 
 public class RightPanel extends SimplePanel{
     RightFormPanel rightFormPanel;
-    public RightPanel(ServerConnection connection){
+    public RightPanel(ServerConnection connection,TopPanel topPanel,LeftPanel leftPanel){
         super();
-        rightFormPanel = new RightFormPanel(connection);
+        rightFormPanel = new RightFormPanel(connection, topPanel, leftPanel);
         panel.setLayout(new GridLayout(3,1));
         panel.add(rightFormPanel.getPanel());
     }

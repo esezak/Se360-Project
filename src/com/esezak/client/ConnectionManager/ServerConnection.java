@@ -1,5 +1,6 @@
 package com.esezak.client.ConnectionManager;
 import com.esezak.client.ConnectionManager.Requests.Request;
+import com.esezak.client.ConnectionManager.Requests.RequestType;
 import com.esezak.server.ConnectionManager.Responses.Response;
 import com.esezak.server.MovieLookup.Content.Content;
 
@@ -13,6 +14,7 @@ public class ServerConnection {
     private Socket connection = null;
     public ArrayList<Content> userWatchlist;
     public Request currentRequest;
+    public Response currentResponse;
     private ObjectOutputStream sendChannel;
     private ObjectInputStream receiveChannel;
     public ServerConnection(String host, int port) {
@@ -38,23 +40,19 @@ public class ServerConnection {
      * Request types: LOGIN, LOGOUT, DISCONNECT, GET_USER_WATCHLIST, ADD_MOVIE_TO_WATCHLIST
      * @return true if request is successful
      */
-    private boolean sendSimpleRequest(Request request){
+    private boolean responseHandler(Request request){
         currentRequest = request;
-        Response response;
+        currentResponse = null;
         try{
             //send request to server
             sendChannel.writeObject(currentRequest);
-
             //receive request from server
-            response = (Response) receiveChannel.readObject();
-            if(!response.getStatus()){
+            currentResponse = (Response) receiveChannel.readObject();
+            if(!currentResponse.getStatus()){
                 System.err.println("Request failed");
                 return false;
             }else{
                 System.out.println(currentRequest.getRequestType()+" Successfully Sent");
-            }
-            if(response.getWatchlist()!=null){
-                userWatchlist = response.getWatchlist();
             }
             return true;
         } catch (IOException e) {
@@ -64,6 +62,17 @@ public class ServerConnection {
             System.err.println("Received class not found");
             return false;
         }
+    }
+    private Response requestHandler(Request request){
+        if(responseHandler(request)){
+            return currentResponse;
+        }
+        return null;
+    }
+    public Response sendFilmQuery(String filmname){
+        currentRequest = new Request();
+        currentRequest.search_movie(filmname);
+        return requestHandler(currentRequest);
     }
 
     private boolean sendAddToWatchListRequest(){
@@ -87,34 +96,17 @@ public class ServerConnection {
     public boolean sendDisconnectRequest(){
         currentRequest = new Request();
         currentRequest.disconnect();
-        return sendSimpleRequest(currentRequest);
+        return responseHandler(currentRequest);
     }
     public boolean sendLogoutRequest(){
         currentRequest = new Request();
         currentRequest.logout();
-        return sendSimpleRequest(currentRequest);
+        return responseHandler(currentRequest);
     }
     public boolean sendLoginRequest(String username, String password){
         currentRequest = new Request();
         currentRequest.login(username,password);
-        return sendSimpleRequest(currentRequest);
-    }
-    public boolean sendLogoutRequest(String username){
-        currentRequest = new Request();
-        currentRequest.logout();
-        return sendSimpleRequest(currentRequest);
+        return responseHandler(currentRequest);
     }
 
-    public static void main (String[] args) {//Connection tests
-        ServerConnection serverConnection = new ServerConnection("localhost", 12345);
-        Request request = new Request();
-        request.login("asd","asd");
-        serverConnection.sendSimpleRequest(request);
-        request = new Request();
-        request.logout();
-        serverConnection.sendSimpleRequest(request);
-        request = new Request();
-        request.disconnect();
-        serverConnection.sendSimpleRequest(request);
-    }
 }

@@ -3,23 +3,25 @@ package com.esezak.server.ConnectionManager;
 import com.esezak.client.ConnectionManager.Requests.Request;
 import com.esezak.client.ConnectionManager.Requests.RequestType;
 import com.esezak.server.ConnectionManager.Responses.Response;
-import com.esezak.server.Database.Init.ConnectDB;
-import com.esezak.server.Database.Management.DB;
+import com.esezak.server.Database.Management.DBConnection;
+import com.esezak.server.MovieLookup.Content.Content;
+import com.esezak.server.MovieLookup.Content.ContentType;
+import com.esezak.server.MovieLookup.TVDB.TVDBSearcher;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 
 
 public class ConnectionThread extends Thread {
     private Socket connection;
     private ObjectOutputStream sendChannel;
-    private ConnectDB connectDB = new ConnectDB();
+    private DBConnection dbConnection;
     private ObjectInputStream receiveChannel;
     private Request currentRequest;
     private Response currentResponse;
@@ -36,6 +38,7 @@ public class ConnectionThread extends Thread {
         try{
             sendChannel = new ObjectOutputStream(connection.getOutputStream());
             receiveChannel = new ObjectInputStream(connection.getInputStream());
+            dbConnection = new DBConnection();
             while (!terminate) {
                 currentRequest = (Request) receiveChannel.readObject();
                 handleRequest(currentRequest);
@@ -60,32 +63,48 @@ public class ConnectionThread extends Thread {
             case RequestType.LOGIN -> handleLoginRequest(request);
             case RequestType.LOGOUT -> handleLogoutRequest();
             case RequestType.DISCONNECT -> handleDisconnectRequest();
+            case RequestType.SEARCH_MOVIE -> handleSearchMovie(request);
             case RequestType.GET_USER_WATCHLIST -> handleWatchlistRequest(request);
             case RequestType.ADD_MOVIE_TO_WATCHLIST -> handleAddMovieToWatchlist(request);
             default -> false;
         };
     }
 
+    private boolean handleSearchMovie(Request request) throws IOException {
+        JSONObject requestData = new JSONObject(request.getData());
+        String movieName = requestData.getString("movie_name");
+        try{
+            ArrayList<Content> movies = TVDBSearcher.queryFromTVDB(movieName, ContentType.movie);
+            currentResponse = new Response(true,movies);
+            sendChannel.writeObject(currentResponse);
+            return true;
+        } catch (IOException e) {
+            System.err.println("Could not search movie " + movieName);
+            sendErrorResponse();
+            return false;
+        }
+    }
+
     //TODO make auth system connected to DB (Bora)
     private boolean handleLoginRequest(Request request) throws IOException {
-        System.out.println("Client Logged in");
+        //System.out.println("Client Logged in");//Client may not be logged in
         JSONObject loginData = new JSONObject(request.getData());   // parses json data
         this.password = loginData.getString("password");     // password field
         this.username = loginData.getString("username");     // username field
-        try (Connection connection = connectDB.getConnection()) {
-            if (connection != null && DB.verifyPassword(connection, username, password)) {
+        try{
+            if (connection != null && dbConnection.verifyPassword(username, password)) {
                 if (!loggedIn) {
                     loggedIn = true;
                     sendOkResponse();
-                    System.out.println("Logged in");
+                    System.out.println(username +" logged in");
                     return true;
                 } else {
-                    System.err.println("User already logged in: ");
+                    System.err.println(username +" already logged in!");
                     sendErrorResponse();
                     return false;
                 }
             } else {
-                System.err.println("Invalid username or password for: ");
+                System.err.println("Invalid username or password for: "+username);
                 sendErrorResponse();
                 return false;
             }
@@ -93,9 +112,9 @@ public class ConnectionThread extends Thread {
             System.err.println("Database Error: " + e.getMessage());
             sendErrorResponse();
             return false;
-        } finally {
+        } /*finally {
             connectDB.closeConnection();
-        }
+        }*/
     }
 
     private boolean handleLogoutRequest() throws IOException {
@@ -141,14 +160,14 @@ public class ConnectionThread extends Thread {
         String movieId = requestData.getString("movie_id");
         String query = "INSERT INTO Watchlist (username, movie_id, date_added, user_rating, status) "
                 + "VALUES (?, ?, datetime('now'), NULL, 'Watching')";
-        try (Connection connection = connectDB.getConnection()) {
-            if (connection != null) {
-                if (DB.isMovieInWatchlist(connection, username, movieId)) {
+        try{
+            if (dbConnection != null) {
+                if (dbConnection.isMovieInWatchlist(username, movieId)) {
                     System.err.println("Movie is already in the watchlist");
                     sendErrorResponse();
                     return false;
                 }
-                try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+                try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query)) {
                     pstmt.setString(1, username);
                     pstmt.setString(2, movieId);
                     pstmt.executeUpdate();
@@ -158,9 +177,9 @@ public class ConnectionThread extends Thread {
             System.err.println("Database Error: " + e.getMessage());
             sendErrorResponse();
             return false;
-        } finally {
+        }/* finally {
             connectDB.closeConnection();
-        }
+        }*/
         sendOkResponse();
         System.out.println("Movie added to watchlist");
         return true;

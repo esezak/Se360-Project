@@ -1,22 +1,41 @@
 package com.esezak.server.Database.Management;
 
-import com.esezak.server.Database.Init.ConnectDB;
 import com.esezak.server.MovieLookup.Content.Content;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
-public class DB {
-    public static void addToDatabase(Content content) {
+public class DBConnection {
+    private Connection dbConnection;
+    private String url = "jdbc:sqlite:mydb.db";
+    public DBConnection() {
+        try {
+            dbConnection = DriverManager.getConnection(url);
+            System.out.println("Connection Successful");
+        } catch (SQLException e) {
+            System.out.println("Error Connecting to Database");
+            e.printStackTrace();
+        }
+    }
+    public Connection getDbConnection() {
+        return dbConnection;
+    }
+    public void closeConnection() {
+        try {
+            if (dbConnection != null) {
+                System.out.println("Connection Closed");
+                dbConnection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public void addToDatabase(Content content) {
         String query = "INSERT INTO Movies (movie_id, title, release_year, genre, director, overview, image_url, rating) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        ConnectDB connectDB = new ConnectDB();
-        try (Connection connection = connectDB.getConnection()) {
-            if (connection != null && !isDuplicate(connection, content)) {
-                try (PreparedStatement statement = connection.prepareStatement(query)) {
+        try{
+            if (dbConnection != null && !isDuplicate(content)) {
+                try (PreparedStatement statement = dbConnection.prepareStatement(query)) {
                     statement.setString(1, content.getId());
                     statement.setString(2, content.getTitle());
                     statement.setString(3, content.getRelease_date());
@@ -40,23 +59,23 @@ public class DB {
             }
         } catch (SQLException e) {
             System.err.println("Database Error: " + e.getMessage());
-        } finally {
-            connectDB.closeConnection();
-        }
+        }/* finally {
+            closeConnection();
+        }*/
     }
 
-    public static boolean isDuplicate(Connection connection, Content content) throws SQLException {
+    public boolean isDuplicate(Content content) throws SQLException {
         String checkQuery = "SELECT 1 FROM Movies WHERE movie_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(checkQuery)) {
+        try (PreparedStatement pstmt = dbConnection.prepareStatement(checkQuery)) {
             pstmt.setString(1, content.getId());
             try (ResultSet rs = pstmt.executeQuery()) {
                 return rs.next();
             }
         }
     }
-    public static boolean verifyPassword(Connection connection, String username, String password) {
+    public boolean verifyPassword(String username, String password) {
         String query = "SELECT password FROM Users WHERE username = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try (PreparedStatement pstmt = dbConnection.prepareStatement(query)) {
             pstmt.setString(1, username);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -69,9 +88,9 @@ public class DB {
         }
         return false;
     }
-    public static boolean isMovieInWatchlist(Connection connection, String username, String movieId) throws SQLException {
+    public boolean isMovieInWatchlist(String username, String movieId) throws SQLException {
         String query = "SELECT 1 FROM Watchlist WHERE username = ? AND movie_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try (PreparedStatement pstmt = dbConnection.prepareStatement(query)) {
             pstmt.setString(1, username);
             pstmt.setString(2, movieId);
             try (ResultSet rs = pstmt.executeQuery()) {

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class Response implements Serializable {
     private boolean status;
-    private ArrayList<Content> watchlist = null;
+    private ArrayList<Content> movies = null;
     private ArrayList<Review> reviews = null;
     private Content movie = null;
     public Response(boolean status) {
@@ -19,16 +19,16 @@ public class Response implements Serializable {
         this.movie = movie;
         this.reviews = reviews;
     }
-    public Response(boolean status, ArrayList<Content> watchlist) {
+    public Response(boolean status, ArrayList<Content> movies) {
         this.status = status;
-        this.watchlist = watchlist;
+        this.movies = movies;
     }
     public boolean getStatus() {
         return status;
     }
 
-    public ArrayList<Content> getWatchlist() {
-        return watchlist;
+    public ArrayList<Content> getMovies() {
+        return movies;
     }
     public ArrayList<Review> getReviews() {
         return reviews;
