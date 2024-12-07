@@ -13,7 +13,6 @@ import java.net.Socket;
 public class ConnectionThread extends Thread {
     private Socket connection;
     private ObjectOutputStream sendChannel;
-
     private ObjectInputStream receiveChannel;
     private Request currentRequest;
     private Response currentResponse;
