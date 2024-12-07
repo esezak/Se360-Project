@@ -3,17 +3,23 @@ package com.esezak.server.ConnectionManager;
 import com.esezak.client.ConnectionManager.Requests.Request;
 import com.esezak.client.ConnectionManager.Requests.RequestType;
 import com.esezak.server.ConnectionManager.Responses.Response;
+import com.esezak.server.Database.Init.ConnectDB;
+import com.esezak.server.Database.Management.DB;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.PreparedStatement;
+
 
 public class ConnectionThread extends Thread {
     private Socket connection;
     private ObjectOutputStream sendChannel;
-
+    private ConnectDB connectDB = new ConnectDB();
     private ObjectInputStream receiveChannel;
     private Request currentRequest;
     private Response currentResponse;
@@ -66,17 +72,29 @@ public class ConnectionThread extends Thread {
         JSONObject loginData = new JSONObject(request.getData());   // parses json data
         this.password = loginData.getString("password");     // password field
         this.username = loginData.getString("username");     // username field
-
-        //TODO if password and username in database && client not logged in -> loggedIn = true
-
-        if(!loggedIn){
-            loggedIn = true;
-            sendOkResponse();
-            return true;
-        }else{
-            System.err.println("Client already logged in");
+        try (Connection connection = connectDB.getConnection()) {
+            if (connection != null && DB.verifyPassword(connection, username, password)) {
+                if (!loggedIn) {
+                    loggedIn = true;
+                    sendOkResponse();
+                    System.out.println("Logged in");
+                    return true;
+                } else {
+                    System.err.println("User already logged in: ");
+                    sendErrorResponse();
+                    return false;
+                }
+            } else {
+                System.err.println("Invalid username or password for: ");
+                sendErrorResponse();
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("Database Error: " + e.getMessage());
             sendErrorResponse();
             return false;
+        } finally {
+            connectDB.closeConnection();
         }
     }
 
@@ -114,8 +132,38 @@ public class ConnectionThread extends Thread {
      */
     //TODO
     private boolean handleAddMovieToWatchlist(Request request) throws IOException {
-        System.err.println("Not yet implemented");
-        return false;
+        if (!loggedIn) {
+            System.err.println("User is not logged in");
+            sendErrorResponse();
+            return false;
+        }
+        JSONObject requestData = new JSONObject(request.getData());
+        String movieId = requestData.getString("movie_id");
+        String query = "INSERT INTO Watchlist (username, movie_id, date_added, user_rating, status) "
+                + "VALUES (?, ?, datetime('now'), NULL, 'Watching')";
+        try (Connection connection = connectDB.getConnection()) {
+            if (connection != null) {
+                if (DB.isMovieInWatchlist(connection, username, movieId)) {
+                    System.err.println("Movie is already in the watchlist");
+                    sendErrorResponse();
+                    return false;
+                }
+                try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+                    pstmt.setString(1, username);
+                    pstmt.setString(2, movieId);
+                    pstmt.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database Error: " + e.getMessage());
+            sendErrorResponse();
+            return false;
+        } finally {
+            connectDB.closeConnection();
+        }
+        sendOkResponse();
+        System.out.println("Movie added to watchlist");
+        return true;
     }
 
     /**
