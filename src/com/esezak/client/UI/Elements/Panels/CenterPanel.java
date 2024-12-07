@@ -17,7 +17,7 @@ public class CenterPanel extends SimplePanel {
         scrollPane = new JScrollPane();
         scrollPane.setViewportView(panel);
         scrollPane.createVerticalScrollBar();
-
+        scrollPane.getVerticalScrollBar().setUnitIncrement(20);
         System.out.println("test");
     }
 

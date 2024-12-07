@@ -27,13 +27,13 @@ public class ClientMainWindow {
         initialize();
     }
     private void initialize() {
+        connection = new ServerConnection("localhost",12345);
         setFrame();
         setCenterPanel();
         setTopPanel();
         setLeftPanel();
         setRightPanel();
         setBottomPanel();
-
     }
     private void setFrame(){
         frame = new JFrame();
@@ -60,7 +60,7 @@ public class ClientMainWindow {
         frame.add(leftPanel.getPanel(), BorderLayout.WEST);
     }
     private void setRightPanel(){
-        rightPanel = new RightPanel();
+        rightPanel = new RightPanel(connection);
         frame.getContentPane().add(rightPanel.getPanel(), BorderLayout.EAST);
     }
 

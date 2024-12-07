@@ -4,10 +4,15 @@ import javax.swing.*;
 
 import static com.esezak.client.UI.ClientMainWindow.GLOBAL_FONT;
 
-public abstract class SimpleTextField {
+public class SimpleTextField {
     JTextField textField;
     public SimpleTextField() {
         textField = new JTextField(10);
+        textField.setEditable(true);
+        textField.setFont(GLOBAL_FONT);
+    }
+    public SimpleTextField(int column) {
+        textField = new JTextField(column);
         textField.setEditable(true);
         textField.setFont(GLOBAL_FONT);
     }

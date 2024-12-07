@@ -7,7 +7,7 @@ import java.awt.*;
 import static com.esezak.client.UI.ClientMainWindow.GLOBAL_BORDER;
 import static com.esezak.client.UI.ClientMainWindow.GLOBAL_FONT;
 
-public abstract class SimpleButton {
+public class SimpleButton {
     public static final Insets BUTTON_MARGINS = new Insets(3, 20, 3, 20);
     JButton button;
     public SimpleButton(String label) {

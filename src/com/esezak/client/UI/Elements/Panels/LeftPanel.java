@@ -13,7 +13,8 @@ public class LeftPanel extends SimplePanel{
         super();
         filmsButton = new FilmsButton();
         watchlistButton = new WatchlistButton();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        //panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setLayout(new GridLayout(18,1,0,1));
         panel.add(filmsButton.getButton());
         panel.add(watchlistButton.getButton());
     }
