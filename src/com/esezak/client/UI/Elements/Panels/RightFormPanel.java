@@ -1,12 +1,11 @@
 package com.esezak.client.UI.Elements.Panels;
 
 import com.esezak.client.ConnectionManager.ServerConnection;
-import com.esezak.client.UI.Elements.Buttons.LoginButton;
 import com.esezak.client.UI.Elements.Buttons.LogoutButton;
 import com.esezak.client.UI.Elements.Buttons.SimpleButton;
 import com.esezak.client.UI.Elements.Labels.SimpleLabel;
 import com.esezak.client.UI.Elements.TextFields.PasswordField;
-import com.esezak.client.UI.Elements.TextFields.UsernameTextField;
+import com.esezak.client.UI.Elements.TextFields.SimpleTextField;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,11 +17,11 @@ public class RightFormPanel extends SimplePanel{
     SimpleLabel passwordLabel = new SimpleLabel("Password:");
     SimpleLabel connectionLabel = new SimpleLabel("Status:");
     SimpleLabel connectionStatusLabel = new SimpleLabel("Not Connected");
-    UsernameTextField usernameTextField = new UsernameTextField();
+    SimpleTextField usernameTextField = new SimpleTextField();
     PasswordField passwordField = new PasswordField();
     SimpleButton connectButton = new SimpleButton("Connect");
     SimpleButton disconnectButton = new SimpleButton("Disconnect");
-    LoginButton loginButton = new LoginButton(usernameTextField, passwordField);
+    SimpleButton loginButton = new SimpleButton("Login");
     LogoutButton logoutButton = new LogoutButton();
     ServerConnection connection;
 
@@ -45,14 +44,22 @@ public class RightFormPanel extends SimplePanel{
         connectButton.getButton().addActionListener(new ConnectButtonListener());
         disconnectButton.getButton().addActionListener(new DisconnectButtonListener());
         disconnectButton.getButton().setEnabled(false);
+        loginButton.getButton().addActionListener(new LoginButtonListener());
+        loginButton.getButton().setEnabled(false);
+        logoutButton.getButton().addActionListener(new LogoutButtonListener());
+        logoutButton.getButton().setEnabled(false);
     }
     private class ConnectButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             if(connection.setConnection()){
                 System.out.println("Connection established");
+                connectionStatusLabel.getLabel().setForeground(Color.GREEN);
+                connectionStatusLabel.getLabel().setText("Connected");
                 connectButton.getButton().setEnabled(false);
+                logoutButton.getButton().setEnabled(false);
                 disconnectButton.getButton().setEnabled(true);
+                loginButton.getButton().setEnabled(true);
             }else{
                 System.err.println("Could not connect to server");
             }
@@ -70,8 +77,37 @@ public class RightFormPanel extends SimplePanel{
                 System.out.println("Disconnected from server");
                 connectButton.getButton().setEnabled(true);
                 disconnectButton.getButton().setEnabled(false);
+                loginButton.getButton().setEnabled(false);
+                logoutButton.getButton().setEnabled(false);
+                connectionStatusLabel.getLabel().setForeground(Color.red);
+                connectionStatusLabel.getLabel().setText("Disconnected");
             }else{
                 System.err.println("Could not disconnect from server");
+            }
+        }
+    }
+    private class LoginButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(connection.sendLoginRequest(usernameTextField.getText(), passwordField.getPassword())){
+                System.out.println("Logged in");
+                disconnectButton.getButton().setEnabled(false);
+                loginButton.getButton().setEnabled(false);
+                logoutButton.getButton().setEnabled(true);
+                connectButton.getButton().setEnabled(false);
+            }else{
+                System.err.println("Could not login");
+            }
+        }
+    }
+    private class LogoutButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(connection.sendLogoutRequest()){
+                System.out.println("Logged out");
+                disconnectButton.getButton().setEnabled(true);
+                loginButton.getButton().setEnabled(true);
+                logoutButton.getButton().setEnabled(false);
             }
         }
     }

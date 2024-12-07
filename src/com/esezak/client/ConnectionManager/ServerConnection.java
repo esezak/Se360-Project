@@ -94,6 +94,16 @@ public class ServerConnection {
         currentRequest.logout();
         return sendSimpleRequest(currentRequest);
     }
+    public boolean sendLoginRequest(String username, String password){
+        currentRequest = new Request();
+        currentRequest.login(username,password);
+        return sendSimpleRequest(currentRequest);
+    }
+    public boolean sendLogoutRequest(String username){
+        currentRequest = new Request();
+        currentRequest.logout();
+        return sendSimpleRequest(currentRequest);
+    }
 
     public static void main (String[] args) {//Connection tests
         ServerConnection serverConnection = new ServerConnection("localhost", 12345);
