@@ -40,10 +40,9 @@ public class TopPanel extends SimplePanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             if(!searchTextField.getText().isEmpty()) {
-                //centerPanel.films = connection.sendFilmQuery(searchTextField.getText()).getMovies();
+                centerPanel.films = connection.sendFilmQuery(searchTextField.getText()).getMovies();
             }
-            //centerPanel.retrieveFilms();
-            centerPanel.testPhoto();
+            centerPanel.retrieveFilms();
         }
     }
 

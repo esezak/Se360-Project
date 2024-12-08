@@ -1,16 +1,16 @@
 package com.esezak.client.UI.Elements.Panels;
 
 import com.esezak.client.UI.Elements.Buttons.FilmButton;
-import com.esezak.client.UI.Elements.Buttons.SimpleButton;
 import com.esezak.server.MovieLookup.Content.Content;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class CenterPanel extends SimplePanel {
+public class CenterPanel extends SimplePanel implements Runnable{
     private JScrollPane scrollPane;
     public ArrayList<Content> films = new ArrayList<>();
+    private Content toBeAdded;
     public CenterPanel() {
         super();
         panel.setLayout(new GridLayout(0,1));
@@ -24,16 +24,25 @@ public class CenterPanel extends SimplePanel {
         return scrollPane;
     }
 
-    public void retrieveFilms(){
+    public void retrieveFilms() {
         panel.removeAll();
+        Thread t = null;
         for(Content c : films){
-            panel.add(new FilmButton(c).getButton());
+            toBeAdded = c;
+            t = new Thread(this);
+            t.start();
+            try {
+                t.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
-        panel.revalidate();
-    }
-    public void testPhoto(){
-        panel.add(new FilmButton().getButton());
-        panel.revalidate();
     }
 
+    @Override
+    public void run() {
+        panel.add(new FilmButton(toBeAdded).getButton());
+        panel.revalidate();
+        System.out.println("Process finished");
+    }
 }

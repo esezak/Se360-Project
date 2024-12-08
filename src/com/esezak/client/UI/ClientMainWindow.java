@@ -6,9 +6,6 @@ import com.esezak.client.UI.Elements.Panels.*;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-
-import static com.esezak.client.UI.Elements.Buttons.SimpleButton.BUTTON_MARGINS;
-
 public class ClientMainWindow {
     private JFrame frame;
     private TopPanel topPanel;

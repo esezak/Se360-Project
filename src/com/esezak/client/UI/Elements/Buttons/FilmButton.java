@@ -7,7 +7,7 @@ import java.awt.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class FilmButton extends SimpleButton {
+public class FilmButton extends SimpleButton{
     ImageIcon icon;
     private static int total = 1;
     private String filmName;
@@ -32,15 +32,18 @@ public class FilmButton extends SimpleButton {
         button.setVerticalTextPosition(SwingConstants.BOTTOM);
         button.setHorizontalTextPosition(SwingConstants.CENTER);
         button.setBackground(Color.gray);
+        setIcon(this.film.getImage_url());
+    }
+    private void setIcon(String imgpath){
         try{
-            URL url = new URL(this.film.getImage_url());
+            URL url = new URL(imgpath);
             icon = new ImageIcon(new ImageIcon(url).getImage().getScaledInstance(170, 250, Image.SCALE_SMOOTH));
             button.setIcon(icon);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
     }
-    public FilmButton(){
+    public FilmButton(){//Test method
         super("A Film With A Very Very Very Very Long Title");
         String asd = "https://artworks.thetvdb.com/banners/movies/104007/posters/104007.jpg";
         this.film = null;
@@ -48,12 +51,6 @@ public class FilmButton extends SimpleButton {
         button.setVerticalTextPosition(SwingConstants.BOTTOM);
         button.setHorizontalTextPosition(SwingConstants.CENTER);
         button.setBackground(Color.gray);
-        try{
-            URL url = new URL(asd);
-            icon = new ImageIcon(new ImageIcon(url).getImage().getScaledInstance(170, 250, Image.SCALE_SMOOTH));
-            button.setIcon(icon);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+        setIcon(asd);
     }
 }
