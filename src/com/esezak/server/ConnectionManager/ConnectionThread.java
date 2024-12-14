@@ -6,6 +6,7 @@ import com.esezak.server.ConnectionManager.Responses.Response;
 import com.esezak.server.Database.Management.DBConnection;
 import com.esezak.server.MovieLookup.Content.Content;
 import com.esezak.server.MovieLookup.Content.ContentType;
+import com.esezak.server.MovieLookup.Content.Review;
 import com.esezak.server.MovieLookup.TVDB.TVDBSearcher;
 import org.json.JSONObject;
 
@@ -182,6 +183,50 @@ public class ConnectionThread extends Thread {
         }*/
         sendOkResponse();
         System.out.println("Movie added to watchlist");
+        return true;
+    }
+
+    private boolean handleRateMovieRequest(Request request, String movieId, Review review) throws IOException {
+        if (!loggedIn) {
+            System.err.println("Not logged in");
+            sendErrorResponse();
+            return false;
+        }
+        JSONObject reviewData = new JSONObject(request.getData());
+        this.username = reviewData.getString("username");
+        String comment = review.getComment();
+        int rating = review.getRating();
+        if (rating < 0 || rating > 5) {
+            System.err.println("Invalid rating value");
+            sendErrorResponse();
+            return false;
+        }
+        String query = """
+        INSERT INTO Reviews (username, movie_id, comment, user_rating, review_date)
+        VALUES (?, ?, ?, ?, datetime('now'))
+        ON CONFLICT(username, movie_id)
+        DO UPDATE SET 
+            comment = excluded.comment, 
+            user_rating = excluded.user_rating, 
+            review_date = excluded.review_date
+    """;
+        try {
+            if (dbConnection != null) {
+                try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query)) {
+                    pstmt.setString(1, username);
+                    pstmt.setString(2, movieId);
+                    pstmt.setString(3, comment);
+                    pstmt.setDouble(4, rating);
+                    pstmt.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database Error: " + e.getMessage());
+            sendErrorResponse();
+            return false;
+        }
+        sendOkResponse();
+        System.out.println("Movie rated");
         return true;
     }
 

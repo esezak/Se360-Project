@@ -33,7 +33,7 @@ public class DB_Init {
                 String createReviewsTable = """
             CREATE TABLE IF NOT EXISTS Reviews (
                 username TEXT,
-                movie_id INTEGER,
+                movie_id TEXT,
                 comment TEXT,
                 user_rating REAL,
                 review_date TEXT,

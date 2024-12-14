@@ -98,4 +98,18 @@ public class DBConnection {
             }
         }
     }
+    public double getRating(String movieId) {
+        String query = "SELECT AVG(user_rating) AS average_rating FROM Reviews WHERE movie_id = ?";
+        try (PreparedStatement pstmt = dbConnection.prepareStatement(query)) {
+            pstmt.setString(1, movieId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("average_rating");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database Error: " + e.getMessage());
+        }
+        return 0.0;
+    }
 }
