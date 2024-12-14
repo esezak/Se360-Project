@@ -8,9 +8,11 @@ import java.awt.event.ActionListener;
 public class LeftPanel extends SimplePanel{
     private SimpleButton filmsButton;
     private SimpleButton watchlistButton;
-    public LeftPanel() {
+    private CenterPanel centerPanel;
+    public LeftPanel(CenterPanel centerPanel) {
         super();
-        filmsButton = new SimpleButton("Films");
+        this.centerPanel = centerPanel;
+        filmsButton = new SimpleButton("Search Tab");
         filmsButton.getButton().addActionListener(new FilmsButtonListener());
         watchlistButton = new SimpleButton("Watchlist");
         watchlistButton.getButton().addActionListener(new WatchlistButtonListener());
@@ -33,7 +35,7 @@ public class LeftPanel extends SimplePanel{
     private class FilmsButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Films Button clicked");
+            centerPanel.retrieveOldFilms();
         }
     }
     private class WatchlistButtonListener implements ActionListener {

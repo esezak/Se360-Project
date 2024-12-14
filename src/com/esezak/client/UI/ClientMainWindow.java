@@ -53,7 +53,7 @@ public class ClientMainWindow {
     }
 
     private void setLeftPanel(){
-        leftPanel = new LeftPanel();
+        leftPanel = new LeftPanel(centerPanel);
         frame.add(leftPanel.getPanel(), BorderLayout.WEST);
     }
     private void setRightPanel(){

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class CenterPanel extends SimplePanel implements Runnable{
     private JScrollPane scrollPane;
     public ArrayList<Content> films = new ArrayList<>();
+    private ArrayList<FilmButton> buttons = new ArrayList<>();
     private Content toBeAdded;
     public CenterPanel() {
         super();
@@ -24,25 +25,33 @@ public class CenterPanel extends SimplePanel implements Runnable{
         return scrollPane;
     }
 
-    public void retrieveFilms() {
+    public void retrieveNewFilms() {
         panel.removeAll();
-        Thread t = null;
+        Thread t;
         for(Content c : films){
             toBeAdded = c;
             t = new Thread(this);
             t.start();
             try {
-                t.sleep(100);
+                t.sleep(50);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
     }
-
+    public void retrieveOldFilms() {
+        panel.removeAll();
+        for(FilmButton f : buttons){
+            panel.add(f.getButton());
+        }
+        panel.revalidate();
+    }
     @Override
     public void run() {
-        panel.add(new FilmButton(toBeAdded).getButton());
+        FilmButton asd = new FilmButton(toBeAdded,this);
+        buttons.add(asd);
+        panel.add(asd.getButton());
         panel.revalidate();
-        System.out.println("Process finished");
+        //System.out.println("Process finished");
     }
 }

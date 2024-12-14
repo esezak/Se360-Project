@@ -9,7 +9,7 @@ public class Content implements Serializable {
     private final String release_date;
     private final String genres;
     private final String director;
-    private final String overview;
+    private String overview;
     private final String image_url;
     private float avg_rating;
     private int total_rating;
@@ -80,6 +80,9 @@ public class Content implements Serializable {
         this.total_rating -= rating;
         this.nuber_of_reviews--;
         calcAverageRating();
+    }
+    public void setOverview(String overview) {
+        this.overview = overview;
     }
 
 }

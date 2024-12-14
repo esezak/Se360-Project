@@ -7,6 +7,7 @@ import com.esezak.client.UI.Elements.TextFields.SimpleTextField;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 public class TopPanel extends SimplePanel {
     private SimpleButton searchButton;
@@ -20,6 +21,7 @@ public class TopPanel extends SimplePanel {
         this.centerPanel = centerPanel;
         searchButton = new SimpleButton("Search");
         searchButton.getButton().addActionListener(new onSearchButtonClick());
+        searchButton.getButton().setMnemonic(KeyEvent.VK_ENTER);
         panel.setLayout(new FlowLayout(FlowLayout.CENTER));
         panel.add(label.getLabel());
         panel.add(searchTextField.getTextField());
@@ -42,7 +44,7 @@ public class TopPanel extends SimplePanel {
             if(!searchTextField.getText().isEmpty()) {
                 centerPanel.films = connection.sendFilmQuery(searchTextField.getText()).getMovies();
             }
-            centerPanel.retrieveFilms();
+            centerPanel.retrieveNewFilms();
         }
     }
 

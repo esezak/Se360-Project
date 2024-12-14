@@ -3,7 +3,7 @@ package com.esezak.client.UI.Elements.Panels;
 import javax.swing.*;
 import java.awt.*;
 
-public abstract class SimplePanel {
+public class SimplePanel {
     JPanel panel;
     public SimplePanel() {
         panel = new JPanel();
