@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class CenterPanel extends SimplePanel implements Runnable{
     private JScrollPane scrollPane;
-    public ArrayList<Content> films = new ArrayList<>();
+    private ArrayList<Content> films = new ArrayList<>();
     private ArrayList<FilmButton> buttons = new ArrayList<>();
     private Content toBeAdded;
     public CenterPanel() {
@@ -53,5 +53,14 @@ public class CenterPanel extends SimplePanel implements Runnable{
         panel.add(asd.getButton());
         panel.revalidate();
         //System.out.println("Process finished");
+    }
+    public void setFilms(ArrayList<Content> films){
+        this.films = films;
+    }
+    public void resetFilms(){
+        films.clear();
+    }
+    public void resetButtons(){
+        buttons.clear();
     }
 }

@@ -23,9 +23,9 @@ public class FilmButton extends SimpleButton {
         this.film = film;
         this.centerPanel = centerPanel;
         infoString = "<html><body><h2>"+film.getTitle()+"</h2>"+
-                "<br>Genres: "+film.getGenres()+
-                "<br><p style=\"font-size:10vw\">Overview: "+formatOverview()+"</p>"+
-                "<br>Rating: "+film.getAvg_rating()+"</body></html>";
+                "<p style=\"font-size:8px\">Genres: "+film.getGenres()+"</p>"+
+                "<p style=\"font-size:8px\">Overview: "+ formatLongText()+"</p>"+
+                "<p>Rating: "+film.getAvg_rating()+"</p></body></html>";
         button.setText(infoString);
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setVerticalTextPosition(SwingConstants.NORTH);
@@ -44,7 +44,7 @@ public class FilmButton extends SimpleButton {
             System.err.println("could not get image URL");
         }
     }
-    private String formatOverview(){
+    private String formatLongText(){
         String[] words = film.getOverview().split(" ");
         StringBuilder formatted = new StringBuilder();
         for(int i = 0; i < words.length; i++){

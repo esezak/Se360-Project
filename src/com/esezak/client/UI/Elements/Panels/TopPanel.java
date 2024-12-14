@@ -41,8 +41,10 @@ public class TopPanel extends SimplePanel {
     private class onSearchButtonClick implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+            centerPanel.resetButtons();
+            centerPanel.resetFilms();
             if(!searchTextField.getText().isEmpty()) {
-                centerPanel.films = connection.sendFilmQuery(searchTextField.getText()).getMovies();
+                centerPanel.setFilms(connection.sendFilmQuery(searchTextField.getText()).getMovies());
             }
             centerPanel.retrieveNewFilms();
         }

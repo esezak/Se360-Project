@@ -16,6 +16,11 @@ public class Review implements Serializable {
         this.rating = rating;
         this.comment = "This user has not commented";
     }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     public String getAuthor() {
         return author;
     }
