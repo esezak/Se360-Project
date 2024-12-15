@@ -8,16 +8,18 @@ import javax.swing.border.Border;
 import java.awt.*;
 public class ClientMainWindow {
     private JFrame frame;
-    private TopPanel topPanel;
-    private LeftPanel leftPanel;
-    private RightPanel rightPanel;
-    private CenterPanel centerPanel;
-    private BottomPanel bottomPanel;
+    public TopPanel topPanel;
+    public LeftPanel leftPanel;
+    public RightPanel rightPanel;
+    public CenterPanel centerPanel;
+    public BottomPanel bottomPanel;
     public static final Font GLOBAL_FONT = new Font("Arial", Font.BOLD, 16);
     public static final Border GLOBAL_BORDER = BorderFactory.createEmptyBorder(5,5,5,5);
-    private ServerConnection connection;
-    private boolean isConencted = false;
-    private boolean isLoggedIn = false;
+    public ServerConnection connection;
+    public boolean isConencted = false;
+    public boolean isLoggedIn = false;
+    public String username;
+    public String password;
 
 
     public ClientMainWindow() {
@@ -44,7 +46,7 @@ public class ClientMainWindow {
         frame.setVisible(true);
     }
     private void setTopPanel(){
-        topPanel = new TopPanel(centerPanel,connection);
+        topPanel = new TopPanel(this);
         frame.getContentPane().add(topPanel.getPanel(), BorderLayout.NORTH);
     }
     private void setCenterPanel(){
@@ -53,11 +55,11 @@ public class ClientMainWindow {
     }
 
     private void setLeftPanel(){
-        leftPanel = new LeftPanel(centerPanel);
+        leftPanel = new LeftPanel(this);
         frame.add(leftPanel.getPanel(), BorderLayout.WEST);
     }
     private void setRightPanel(){
-        rightPanel = new RightPanel(connection,topPanel,leftPanel);
+        rightPanel = new RightPanel(this);
         frame.getContentPane().add(rightPanel.getPanel(), BorderLayout.EAST);
     }
 

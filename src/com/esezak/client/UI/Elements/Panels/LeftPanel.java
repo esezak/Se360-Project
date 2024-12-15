@@ -1,17 +1,18 @@
 package com.esezak.client.UI.Elements.Panels;
 
+import com.esezak.client.UI.ClientMainWindow;
 import com.esezak.client.UI.Elements.Buttons.SimpleButton;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class LeftPanel extends SimplePanel{
-    private SimpleButton filmsButton;
-    private SimpleButton watchlistButton;
+    public SimpleButton filmsButton;
+    public SimpleButton watchlistButton;
     private CenterPanel centerPanel;
-    public LeftPanel(CenterPanel centerPanel) {
+    public LeftPanel(ClientMainWindow clientMainWindow) {
         super();
-        this.centerPanel = centerPanel;
+        this.centerPanel = clientMainWindow.centerPanel;
         filmsButton = new SimpleButton("Search Tab");
         filmsButton.getButton().addActionListener(new FilmsButtonListener());
         watchlistButton = new SimpleButton("Watchlist");

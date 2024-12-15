@@ -5,7 +5,6 @@ import com.esezak.client.ConnectionManager.Requests.RequestType;
 import com.esezak.server.ConnectionManager.Responses.Response;
 import com.esezak.server.Database.Management.DBConnection;
 import com.esezak.server.MovieLookup.Content.Content;
-import com.esezak.server.MovieLookup.Content.ContentType;
 import com.esezak.server.MovieLookup.Content.Review;
 import com.esezak.server.MovieLookup.TVDB.TVDBSearcher;
 import org.json.JSONObject;
@@ -78,7 +77,7 @@ public class ConnectionThread extends Thread {
         JSONObject requestData = new JSONObject(request.getData());
         String movieName = requestData.getString("movie_name");
         try{
-            ArrayList<Content> movies = TVDBSearcher.queryFromTVDB(movieName, ContentType.movie);
+            ArrayList<Content> movies = TVDBSearcher.queryFromTVDB(movieName);
             currentResponse = new Response(true,movies);
             sendChannel.writeObject(currentResponse);
             return true;

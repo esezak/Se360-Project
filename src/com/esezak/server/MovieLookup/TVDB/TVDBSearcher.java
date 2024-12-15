@@ -11,27 +11,30 @@ import java.util.ArrayList;
 
 public class TVDBSearcher {
     private static final String API_URL = "https://api4.thetvdb.com/v4";
-    private static final String TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2UiOiIiLCJhcGlrZXkiOiI5OGQ1MzgzNy00ZTk1LTRmNjQtYjI2ZC1lMDQyNzU4ZWFiMDEiLCJjb21tdW5pdHlfc3VwcG9ydGVkIjpmYWxzZSwiZXhwIjoxNzM0NzQ0OTQ4LCJnZW5kZXIiOiIiLCJoaXRzX3Blcl9kYXkiOjEwMDAwMDAwMCwiaGl0c19wZXJfbW9udGgiOjEwMDAwMDAwMCwiaWQiOiIyNjk4ODkyIiwiaXNfbW9kIjpmYWxzZSwiaXNfc3lzdGVtX2tleSI6ZmFsc2UsImlzX3RydXN0ZWQiOmZhbHNlLCJwaW4iOm51bGwsInJvbGVzIjpbXSwidGVuYW50IjoidHZkYiIsInV1aWQiOiIifQ.iuhDMRIVoahwRjGmZWOvCJszBYdYZt2HS-t6IUvMCdJITu9D1h0AXZUehRcwavRfm5LBb9uTMsiRmvpdt-ZOJ1q9fjRZKAJShFwSsdbnawxvhibnHdCA8Jyh60RUUzjMVOuFN2EzvPbgkZJcROXuPrc4tDyoK7YuKFlpcIkjbIB3OoW-yvi-MqPlYCw48MFFqgvQni08r2V8eKQKSw6c3VN_yFm3YiCgs1LgQ2_pldeypLfWbzcxWxRbOFWOg-FUTM6tC7FxMSQxouW0cA2282SACtDObh2IBv-yDgtRUY5fnuNeUd3zmls9ps1mJ4ckg10WXLG191Prr9_ych1vnxkwpqYlrz-pnsdSK69oEa7CztB8maanZFOGildBPUTGbyuid2dfYRcI60OiIgTwf0V4lZaFXy3qJ3iebvjnSg5WDpXmDspG7PaKGWg4_mKpVZkjQcWR_i3Si_aMTyoGLFRZPct0NAShKXG3L8c4i5BsIqv0hguHGuL-9EpRyrkaPHJLeCmzD8EsKXMbZxHzKHQGv6t5rM5bwFAxb4w7p-405nxdR94oTksYyoDayv6gWhYKC3lHPAJ14YIhDq8ti4MpTx3vtKBgyrAgo9GLPtpG5w1Fz14j2L7sBj7zRP-AInMsByxgFvZDDpMjudQubD78HwyEsFn0OyXLe_WtZyU";
+    //Last TOKEN generated: 15/12/24
+    //Valid for one month
+    private static final String TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2UiOiIiLCJhcGlrZXkiOiI5OGQ1MzgzNy00ZTk1LTRmNjQtYjI2ZC1lMDQyNzU4ZWFiMDEiLCJjb21tdW5pdHlfc3VwcG9ydGVkIjpmYWxzZSwiZXhwIjoxNzM2OTAxMDk1LCJnZW5kZXIiOiIiLCJoaXRzX3Blcl9kYXkiOjEwMDAwMDAwMCwiaGl0c19wZXJfbW9udGgiOjEwMDAwMDAwMCwiaWQiOiIyNjk4ODkyIiwiaXNfbW9kIjpmYWxzZSwiaXNfc3lzdGVtX2tleSI6ZmFsc2UsImlzX3RydXN0ZWQiOmZhbHNlLCJwaW4iOm51bGwsInJvbGVzIjpbXSwidGVuYW50IjoidHZkYiIsInV1aWQiOiIifQ.vCYedcwBmpxxjRmX-fgDRooN5j-fxdnFGXQvK8jyFLQ2nquUSSXBImUA4IuVpif6HfKflp8zFEXQjmFaisJdKWllO6hAu6ljohT2jn-4TJB_06DdlLtB1Wp_StXsgc_FVUGvaz7AdfP1rrDqG9Pd_ihBl5zCunx-Yi5cgxJffCCP2xhf58krJ9AW6JZVR1pW0lCWiutKSOnIMZaRT4C-Q9q4c3AQ8DXwEQQUFSPnliuGUtAE-D_TCHkHAaKUi7VMWQSy1bGcNnqLEn_Hn7DE92rBQjsd-9KAREMxymrQ2Wv9HTLEhdHjsMay0xgYm6mFJF7INaTOCF36TRM7tTZFHfk6ivy39KmuEF7jfwMQVyMxfkLhFEjTtwot8W_OHQKtNiaCZ3i9oL5q41_DkAp0xn07hOLrOHWS65sE_U1F7uruKJKRBILSFwdxMIEwzVsMDwjeN6TCSHJdS6bdyCVhwYOtwEzLhXn11FxV97_t5p9zAz_Nunzveama2e77n_IJKqtV32hnaY2gMQIEhJA0s8CqZdz4PmLhzk8i8K0P4EY977x_SECOkuieSb3SGR9WNrzH0X7qRi07l9L8ETrZz5TtOydD9o8LEY4mywCnZJWPoRHV3cKQT5P_YtpAbHLvFacCMreKztZ6THrVlrPeQmroU_sI86jq-dc5lUwZ5Ls";
+
 
 
 
     /**
      *
      * @param contentName name of the content
-     * @param contentType type of content (movie/series)
      * @return list of content objects
      */
-    public static ArrayList<Content> queryFromTVDB(String contentName, ContentType contentType) {
+    public static ArrayList<Content> queryFromTVDB(String contentName) {
         ArrayList<Content> contents = null;
         DBConnection dbConnection = new DBConnection();
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpGet request = new HttpGet(API_URL + "/search?query=" + stringParser(contentName) + "&type=" + contentType.toString());
+            HttpGet request = new HttpGet(API_URL + "/search?query=" + stringParser(contentName) + "&type=movie");
+
             request.setHeader("accept", "application/json");
             request.addHeader("Authorization", "Bearer " + TOKEN);
 
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 if (response.getStatusLine().getStatusCode() == 200) {
-                    contents = parseJson(EntityUtils.toString(response.getEntity()), contentType);
+                    contents = parseJson(EntityUtils.toString(response.getEntity()));
                     for (Content content : contents) {
                         dbConnection.addToDatabase(content);
                     }
@@ -45,7 +48,7 @@ public class TVDBSearcher {
         return contents;
     }
 
-    private static ArrayList<Content> parseJson(String response, ContentType type) {
+    private static ArrayList<Content> parseJson(String response) {
         ArrayList<Content> contents = new ArrayList<>();
         JSONObject json = new JSONObject(response);
         JSONArray jsonArray = json.getJSONArray("data");
@@ -76,7 +79,7 @@ public class TVDBSearcher {
     }
 
     public static void main(String[] args) {
-        ArrayList<Content> movieContents = TVDBSearcher.queryFromTVDB("Star Wars", ContentType.movie);
+        ArrayList<Content> movieContents = TVDBSearcher.queryFromTVDB("Star Wars");
         if (movieContents != null) {
             for (Content content : movieContents) {
                 content.displayContent();

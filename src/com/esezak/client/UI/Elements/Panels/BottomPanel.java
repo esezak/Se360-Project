@@ -5,11 +5,10 @@ import com.esezak.client.UI.Elements.Labels.SimpleLabel;
 import java.awt.*;
 
 public class BottomPanel extends SimplePanel {
-    SimpleLabel label;
     public BottomPanel() {
         super();
         panel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        label = new SimpleLabel("Powered By: TVDB.com");
+        SimpleLabel label = new SimpleLabel("Powered By: TVDB.com");
         label.getLabel().setForeground(Color.BLUE);
         panel.add(label.getLabel());
     }
