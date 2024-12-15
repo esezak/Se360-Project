@@ -44,7 +44,7 @@ public class FilmPanel extends SimplePanel {
     }
     private void addReview(Review review) {
 
-        String htmlReview = "<html><body><h2>User: "+review.getAuthor()+"</h2>"+
+        String htmlReview = "<html><body><h2>User: "+review.getUsername()+"</h2>"+
                 "<p style=\"font-size:12px\">Score: "+review.getRating()+"</p>"+
                 "<p style=\"font-size:12px\">Comment: "+formatLongText(review.getComment())+"</p></body></html>";
         SimpleLabel label = new SimpleLabel(htmlReview);

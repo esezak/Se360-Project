@@ -64,9 +64,12 @@ public class ConnectionThread extends Thread {
             case RequestType.LOGIN -> handleLoginRequest(request);
             case RequestType.LOGOUT -> handleLogoutRequest();
             case RequestType.DISCONNECT -> handleDisconnectRequest();
-            case RequestType.SEARCH_MOVIE -> handleSearchMovie(request);
-            case RequestType.GET_USER_WATCHLIST -> handleWatchlistRequest(request);
+            case RequestType.GET_USER_WATCHLIST -> handleGetWatchlistRequest(request);
             case RequestType.ADD_MOVIE_TO_WATCHLIST -> handleAddMovieToWatchlist(request);
+            case RequestType.RATE_MOVIE -> handleRateMovieRequest(request);
+            case RequestType.SEARCH_MOVIE -> handleSearchMovie(request);
+            //case RequestType.GET_MOVIE_INFORMATION ->
+
             default -> false;
         };
     }
@@ -86,9 +89,7 @@ public class ConnectionThread extends Thread {
         }
     }
 
-    //TODO make auth system connected to DB (Bora)
     private boolean handleLoginRequest(Request request) throws IOException {
-        //System.out.println("Client Logged in");//Client may not be logged in
         JSONObject loginData = new JSONObject(request.getData());   // parses json data
         this.password = loginData.getString("password");     // password field
         this.username = loginData.getString("username");     // username field
@@ -113,14 +114,14 @@ public class ConnectionThread extends Thread {
             System.err.println("Database Error: " + e.getMessage());
             sendErrorResponse();
             return false;
-        } /*finally {
-            connectDB.closeConnection();
-        }*/
+        }
     }
 
     private boolean handleLogoutRequest() throws IOException {
         if (loggedIn) {
             loggedIn = false;
+            this.password = null;
+            this.username = null;
             System.out.println("Client Logged out");
             sendOkResponse();
             return true;
@@ -137,8 +138,22 @@ public class ConnectionThread extends Thread {
         connection.close();
         return true;
     }
-    //TODO
-    private boolean handleWatchlistRequest(Request request) throws IOException {
+
+    /**
+     * @param request
+     * @return sets the current response status true if succesfull and adds Arraylist of movies in <br>
+     * Response.movies
+     * @throws IOException
+     */
+    //TODO Boraaaa user watchlisti döndüren kod
+    private boolean handleGetWatchlistRequest(Request request) throws IOException {
+        currentRequest = request;
+        JSONObject requestData = new JSONObject(request.getData());
+        String username = requestData.getString("username");
+        if(!checkAuth(username)){
+            sendErrorResponse();
+            return false;
+        }
         System.err.println("Not yet implemented");
         return false;
     }
@@ -150,15 +165,14 @@ public class ConnectionThread extends Thread {
      * @return true if the movie is added successfully
      * @throws IOException
      */
-    //TODO
     private boolean handleAddMovieToWatchlist(Request request) throws IOException {
-        if (!loggedIn) {
-            System.err.println("User is not logged in");
+        JSONObject requestData = new JSONObject(request.getData());
+        String movieId = requestData.getString("movie_id");
+        String username = requestData.getString("username");
+        if(!checkAuth(username)){
             sendErrorResponse();
             return false;
         }
-        JSONObject requestData = new JSONObject(request.getData());
-        String movieId = requestData.getString("movie_id");
         String query = "INSERT INTO Watchlist (username, movie_id, date_added, user_rating, status) "
                 + "VALUES (?, ?, datetime('now'), NULL, 'Watching')";
         try{
@@ -178,26 +192,31 @@ public class ConnectionThread extends Thread {
             System.err.println("Database Error: " + e.getMessage());
             sendErrorResponse();
             return false;
-        }/* finally {
-            connectDB.closeConnection();
-        }*/
+        }
         sendOkResponse();
         System.out.println("Movie added to watchlist");
         return true;
     }
 
-    private boolean handleRateMovieRequest(Request request, String movieId, Review review) throws IOException {
-        if (!loggedIn) {
-            System.err.println("Not logged in");
+    /**
+     * @param request
+     * @return true if rate movie request is successfully completed else false
+     * @throws IOException
+     */
+    private boolean handleRateMovieRequest(Request request) throws IOException {
+        JSONObject reviewData = new JSONObject(request.getData());
+        Review review = Review.parseJson(reviewData);//Automatically parses json to review object
+        String username = reviewData.getString("username");
+        String movieId = reviewData.getString("movie_id");
+
+        if(!checkAuth(username)){
             sendErrorResponse();
             return false;
         }
-        JSONObject reviewData = new JSONObject(request.getData());
-        this.username = reviewData.getString("username");
         String comment = review.getComment();
         int rating = review.getRating();
-        if (rating < 0 || rating > 5) {
-            System.err.println("Invalid rating value");
+        if (rating < 0 || rating > 10) {
+            System.err.println("Invalid rating value for: "+rating);
             sendErrorResponse();
             return false;
         }
@@ -248,5 +267,23 @@ public class ConnectionThread extends Thread {
         System.err.println("Sent error response");
         currentResponse = new Response(false);
         sendChannel.writeObject(currentResponse);
+    }
+
+    /**
+     * @param username
+     * @return false if logged-in username == request maker username and user is logged in else true
+     * @throws IOException
+     */
+    private boolean checkAuth(String username) throws IOException {
+        if (!loggedIn) {
+            System.err.println("Not logged in");
+            sendErrorResponse();
+            return false;
+        }
+        if(!username.equals(this.username)){
+            System.err.println("User logged in as: "+this.username+" but tried to add movie to watchlist as: "+username);
+            return false;
+        }
+        return true;
     }
 }

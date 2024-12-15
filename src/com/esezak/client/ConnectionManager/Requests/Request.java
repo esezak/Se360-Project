@@ -26,14 +26,16 @@ public class Request implements Serializable {
         json = null;
         data = null;
     }
-    public void get_user_watchlist(){
+    public void get_user_watchlist(String username){
         requestType = RequestType.GET_USER_WATCHLIST;
-        json = null;
-        data = null;
+        json = new JSONObject();
+        json.put("username", username);
+        data = json.toString();
     }
-    public void add_movie_to_watchlist(String movie_id){
+    public void add_movie_to_watchlist(String movie_id, String username){
         json = new JSONObject();
         requestType = RequestType.ADD_MOVIE_TO_WATCHLIST;
+        json.put("username", username);
         json.put("movie_id", movie_id);
         data = json.toString();
     }
@@ -41,7 +43,7 @@ public class Request implements Serializable {
         json = new JSONObject();
         requestType = RequestType.RATE_MOVIE;
         json.put("movie_id", movie_id);
-        json.put("author", review.getAuthor());
+        json.put("username", review.getUsername());
         json.put("rating", review.getRating());
         json.put("comment", review.getComment());
         data = json.toString();

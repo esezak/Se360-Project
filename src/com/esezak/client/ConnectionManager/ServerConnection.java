@@ -1,8 +1,8 @@
 package com.esezak.client.ConnectionManager;
 import com.esezak.client.ConnectionManager.Requests.Request;
-import com.esezak.client.ConnectionManager.Requests.RequestType;
 import com.esezak.server.ConnectionManager.Responses.Response;
 import com.esezak.server.MovieLookup.Content.Content;
+import com.esezak.server.MovieLookup.Content.Review;
 
 import java.io.*;
 import java.net.*;
@@ -12,7 +12,10 @@ public class ServerConnection {
     private String host;
     private int port;
     private Socket connection = null;
-    public ArrayList<Content> userWatchlist;
+//    public ArrayList<Content> movies;
+//    public ArrayList<Review> reviews;
+//    public Content movie;
+
     public Request currentRequest;
     public Response currentResponse;
     private ObjectOutputStream sendChannel;
@@ -37,7 +40,8 @@ public class ServerConnection {
 
 
     /**
-     * Request types: LOGIN, LOGOUT, DISCONNECT, GET_USER_WATCHLIST, ADD_MOVIE_TO_WATCHLIST
+     * Sets the current response so that the data from the response can be used from the ui
+     * <br> Request types: LOGIN, LOGOUT, DISCONNECT, GET_USER_WATCHLIST, ADD_MOVIE_TO_WATCHLIST
      * @return true if request is successful
      */
     private boolean responseHandler(Request request){
@@ -63,6 +67,11 @@ public class ServerConnection {
             return false;
         }
     }
+
+    /**
+     * @param request passes the request to request handler
+     * @return returns the current response if the request is sent successfully returns null if request fails
+     */
     private Response requestHandler(Request request){
         if(responseHandler(request)){
             return currentResponse;
@@ -75,23 +84,26 @@ public class ServerConnection {
         return requestHandler(currentRequest);
     }
 
-    private boolean sendAddToWatchListRequest(){
-        Request request = currentRequest;
-        Response response;
-        try{
-            //Send request to server
-            sendChannel.writeObject(request);
-            //receive request from server
-            response = (Response) receiveChannel.readObject();
-            if(!response.getStatus()){
-                System.out.println("Request failed");
-                return false;
-            }
-            return true;
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Could not send add to watchlist request");
-            return false;
-        }
+    /**
+     * @param movie_id
+     *
+     * @return a Response that has the movie reviews
+     */
+    public Response getFilmInformation(String movie_id){ // returns the response filled with reviews
+        currentRequest = new Request();
+        currentRequest.get_movie_information(movie_id);
+        return requestHandler(currentRequest);
+    }
+
+    public boolean sendAddToWatchListRequest(String movie_id, String username){
+        currentRequest = new Request();
+        currentRequest.add_movie_to_watchlist(movie_id, username);
+        return responseHandler(currentRequest);
+    }
+    public boolean getUserWatchlistRequest(String username){
+        currentRequest = new Request();
+        currentRequest.get_user_watchlist(username);
+        return responseHandler(currentRequest);
     }
     public boolean sendDisconnectRequest(){
         currentRequest = new Request();
