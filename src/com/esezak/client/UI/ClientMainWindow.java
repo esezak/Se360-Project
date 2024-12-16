@@ -29,10 +29,11 @@ public class ClientMainWindow {
         connection = new ServerConnection("localhost",12345);
         setFrame();
         setCenterPanel();
-        setTopPanel();
         setLeftPanel();
+        setTopPanel();
         setRightPanel();
         setBottomPanel();
+
     }
     private void setFrame(){
         frame = new JFrame();
@@ -50,7 +51,7 @@ public class ClientMainWindow {
         frame.getContentPane().add(topPanel.getPanel(), BorderLayout.NORTH);
     }
     private void setCenterPanel(){
-        centerPanel = new CenterPanel();
+        centerPanel = new CenterPanel(this);
         frame.getContentPane().add(centerPanel.getScrollPane(), BorderLayout.CENTER);
     }
 
@@ -66,5 +67,10 @@ public class ClientMainWindow {
     private void setBottomPanel(){
         bottomPanel = new BottomPanel();
         frame.getContentPane().add(bottomPanel.getPanel(), BorderLayout.SOUTH);
+    }
+    public static class Launcher {
+        public static void main(String[] args) {
+            SwingUtilities.invokeLater(() -> {ClientMainWindow main = new ClientMainWindow();});
+        }
     }
 }

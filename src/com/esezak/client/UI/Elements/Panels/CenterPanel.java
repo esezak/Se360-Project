@@ -1,5 +1,6 @@
 package com.esezak.client.UI.Elements.Panels;
 
+import com.esezak.client.UI.ClientMainWindow;
 import com.esezak.client.UI.Elements.Buttons.FilmButton;
 import com.esezak.server.MovieLookup.Content.Content;
 
@@ -12,8 +13,10 @@ public class CenterPanel extends SimplePanel implements Runnable{
     private ArrayList<Content> films = new ArrayList<>();
     private ArrayList<FilmButton> buttons = new ArrayList<>();
     private Content toBeAdded;
-    public CenterPanel() {
+    private ClientMainWindow clientMainWindow;
+    public CenterPanel(ClientMainWindow clientMainWindow) {
         super();
+        this.clientMainWindow = clientMainWindow;
         panel.setLayout(new GridLayout(0,1));
         scrollPane = new JScrollPane();
         scrollPane.setViewportView(panel);
@@ -62,5 +65,8 @@ public class CenterPanel extends SimplePanel implements Runnable{
     }
     public void resetButtons(){
         buttons.clear();
+    }
+    public ClientMainWindow getClientMainWindow() {
+        return clientMainWindow;
     }
 }

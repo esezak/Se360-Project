@@ -2,14 +2,18 @@ package com.esezak.client.UI.Elements.Panels;
 
 import com.esezak.client.UI.ClientMainWindow;
 import com.esezak.client.UI.Elements.Buttons.SimpleButton;
+import com.esezak.server.MovieLookup.Content.Content;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class LeftPanel extends SimplePanel{
     public SimpleButton filmsButton;
     public SimpleButton watchlistButton;
     private CenterPanel centerPanel;
+    public ArrayList<Content> watchlist = null;
     public LeftPanel(ClientMainWindow clientMainWindow) {
         super();
         this.centerPanel = clientMainWindow.centerPanel;
@@ -43,7 +47,9 @@ public class LeftPanel extends SimplePanel{
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("WatchlistButton clicked");
+            centerPanel.getPanel().removeAll();
+            centerPanel.getPanel().add(new WatchlistPanel().getPanel());
+            centerPanel.getPanel().revalidate();
         }
     }
 }

@@ -28,6 +28,7 @@ public class RightPanel extends SimplePanel{
     private TopPanel topPanel;
     private LeftPanel leftPanel;
     private ServerConnection connection;
+    private ClientMainWindow clientMainWindow;
     public RightPanel(ClientMainWindow clientMainWindow){
         super();
         rightFormPanel = new SimplePanel();
@@ -35,6 +36,7 @@ public class RightPanel extends SimplePanel{
         this.connection = clientMainWindow.connection;
         this.topPanel = clientMainWindow.topPanel;
         this.leftPanel = clientMainWindow.leftPanel;
+        this.clientMainWindow = clientMainWindow;
         this.rightFormPanel.getPanel().setPreferredSize(new Dimension(250, 10));
         this.rightFormPanel.getPanel().setLayout(new GridLayout(6,2,5,5));
         this.rightFormPanel.getPanel().add(usernameLabel.getLabel());
@@ -73,6 +75,8 @@ public class RightPanel extends SimplePanel{
                 loginButton.getButton().setEnabled(true);
                 leftPanel.setFilmsButtonState(true);
                 topPanel.setSearchStatus(true);
+                clientMainWindow.isConencted = true;
+
             }else{
                 System.err.println("Could not connect to server");
             }
@@ -96,6 +100,8 @@ public class RightPanel extends SimplePanel{
                 connectionStatusLabel.getLabel().setText("Disconnected");
                 topPanel.setSearchStatus(false);
                 leftPanel.setFilmsButtonState(false);
+                clientMainWindow.isConencted = false;
+                clientMainWindow.isLoggedIn = false;
             }else{
                 System.err.println("Could not disconnect from server");
             }
@@ -106,6 +112,8 @@ public class RightPanel extends SimplePanel{
         public void actionPerformed(ActionEvent e) {
             if(connection.sendLoginRequest(usernameTextField.getText(), passwordField.getPassword())){
                 System.out.println("Logged in");
+                clientMainWindow.username = usernameTextField.getText();
+                clientMainWindow.password = passwordField.getPassword();
                 disconnectButton.getButton().setEnabled(false);
                 loginButton.getButton().setEnabled(false);
                 logoutButton.getButton().setEnabled(true);
@@ -115,6 +123,8 @@ public class RightPanel extends SimplePanel{
                 loginStatusLabel.getLabel().setText("Logged in");
                 usernameTextField.getTextField().setEditable(false);
                 passwordField.getPasswordField().setEditable(false);
+                clientMainWindow.isConencted = true;
+                clientMainWindow.isLoggedIn = true;
             }else{
                 System.err.println("Could not login");
             }
@@ -125,6 +135,8 @@ public class RightPanel extends SimplePanel{
         public void actionPerformed(ActionEvent e) {
             if(connection.sendLogoutRequest()){
                 System.out.println("Logged out");
+                clientMainWindow.username = null;
+                clientMainWindow.password = null;
                 disconnectButton.getButton().setEnabled(true);
                 loginButton.getButton().setEnabled(true);
                 logoutButton.getButton().setEnabled(false);
@@ -133,6 +145,8 @@ public class RightPanel extends SimplePanel{
                 loginStatusLabel.getLabel().setForeground(Color.red);
                 usernameTextField.getTextField().setEditable(true);
                 passwordField.getPasswordField().setEditable(true);
+                clientMainWindow.isConencted = true;
+                clientMainWindow.isLoggedIn = false;
             }
         }
     }

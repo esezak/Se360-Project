@@ -64,7 +64,10 @@ public class FilmButton extends SimpleButton {
         @Override
         public void actionPerformed(ActionEvent e) {
             centerPanel.getPanel().removeAll();
-            centerPanel.getPanel().add(new FilmPanel(film,icon).getPanel());
+            FilmPanel filmPanel = new FilmPanel(film,icon, centerPanel.getClientMainWindow());
+            filmPanel.addToWatchListButton.getButton().setEnabled(centerPanel.getClientMainWindow().isLoggedIn);
+            filmPanel.commentButton.getButton().setEnabled(centerPanel.getClientMainWindow().isLoggedIn);
+            centerPanel.getPanel().add(filmPanel.getPanel());
             centerPanel.getPanel().revalidate();
         }
     }
