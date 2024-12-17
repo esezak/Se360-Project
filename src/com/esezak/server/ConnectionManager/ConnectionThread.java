@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
@@ -284,5 +285,21 @@ public class ConnectionThread extends Thread {
             return false;
         }
         return true;
+    }
+    public static void main(String[] args) {
+        int port = 12345;
+
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
+            System.out.println("Server is listening on port " + port);
+
+            while (true) {
+                Socket socket = serverSocket.accept();
+                System.out.println("New client connected");
+
+                new ConnectionThread(socket).start();//Start new Thread
+            }
+        } catch (IOException ex) {
+            System.out.println("Server exception: " + ex.getMessage());
+        }
     }
 }
