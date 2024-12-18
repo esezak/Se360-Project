@@ -56,7 +56,7 @@ public class FilmPanel extends SimplePanel {
         addToWatchListButton.getButton().setIcon(addIcon);
         addToWatchListButton.getButton().setBorder(BorderFactory.createLineBorder(Color.black));
         addToWatchListButton.getButton().setEnabled(clientMainWindow.isLoggedIn);
-
+        addToWatchListButton.getButton().addActionListener(new onAddToWatchListButtonClick());
         buttonsPanel = new SimplePanel();
         buttonsPanel.getPanel().setLayout(new GridLayout(1,2));
         buttonsPanel.getPanel().add(commentButton.getButton());
@@ -74,7 +74,6 @@ public class FilmPanel extends SimplePanel {
 
     }
     private void addReview(Review review) {
-
         String htmlReview = "<html><body><h2>User: "+review.getUsername()+"</h2>"+
                 "<p style=\"font-size:12px\">Score: "+review.getRating()+"</p>"+
                 "<p style=\"font-size:12px\">Comment: "+formatLongText(review.getComment())+"</p></body></html>";
@@ -105,6 +104,17 @@ public class FilmPanel extends SimplePanel {
             reviewPanel.getPanel().add(submitButton.getButton(),BorderLayout.EAST);
             userInputHolderPanel.getPanel().add(reviewPanel.getPanel(),BorderLayout.CENTER);
             clientMainWindow.centerPanel.getPanel().revalidate();
+        }
+    }
+    private class onAddToWatchListButtonClick implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (clientMainWindow.connection.sendAddToWatchListRequest(film.getId(), clientMainWindow.getUsername())) {
+                System.out.println("Added to watch list");
+                addToWatchListButton.getButton().setEnabled(false);
+            }else{
+                System.out.println("Failed to add to watch list");
+            }
         }
     }
 
