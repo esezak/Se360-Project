@@ -49,11 +49,8 @@ public class WatchlistPanel extends SimplePanel{
     }
 
     private JTable table;
-    private SimpleButton saveButton;
-    private String data;
     public WatchlistPanel(String data){
         super();
-        this.data = data;
         WatchilstTableModel tableModel = new WatchilstTableModel();
         JSONArray jsonArray = new JSONArray(data);
         Object[] row = null;
@@ -69,6 +66,7 @@ public class WatchlistPanel extends SimplePanel{
         }
         table = new JTable(tableModel);
         table.setRowHeight(20);
+        table.setAutoCreateRowSorter(true);
         // Initializing the JTable
         table.setBackground(Color.gray);
         table.setFont(new Font(GLOBAL_FONT.getFontName(), Font.PLAIN, 23));
