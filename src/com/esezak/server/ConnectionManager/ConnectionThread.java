@@ -68,14 +68,14 @@ public class ConnectionThread extends Thread {
             case RequestType.ADD_MOVIE_TO_WATCHLIST -> handleAddMovieToWatchlist(request);
             case RequestType.RATE_MOVIE -> handleRateMovieRequest(request);
             case RequestType.SEARCH_MOVIE -> handleSearchMovie(request);
-            case RequestType.GET_MOVIE_INFORMATION -> handleGetMovieRequest(request);
+            case RequestType.GET_MOVIE_INFORMATION -> handleGetMovieReviews(request);
 
             default -> false;
         };
     }
 
     //TODO BORA
-    private boolean handleGetMovieRequest(Request request) throws IOException {
+    private boolean handleGetMovieReviews(Request request) throws IOException {
         JSONObject json = new JSONObject(request.getData());
         Content requestedContent = null;
         ArrayList<Review> requestedMovieReviews = null;
