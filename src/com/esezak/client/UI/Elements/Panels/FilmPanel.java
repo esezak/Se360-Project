@@ -2,7 +2,7 @@ package com.esezak.client.UI.Elements.Panels;
 
 import com.esezak.client.UI.ClientMainWindow;
 import com.esezak.client.UI.Elements.Buttons.SimpleButton;
-import com.esezak.client.UI.Elements.Labels.SimpleLabel;
+import com.esezak.client.UI.Elements.SimpleLabel;
 import com.esezak.server.MovieLookup.Content.Content;
 import com.esezak.server.MovieLookup.Content.Review;
 

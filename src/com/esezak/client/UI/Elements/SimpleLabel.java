@@ -1,8 +1,6 @@
-package com.esezak.client.UI.Elements.Labels;
+package com.esezak.client.UI.Elements;
 
 import javax.swing.*;
-
-import java.awt.*;
 
 import static com.esezak.client.UI.ClientMainWindow.GLOBAL_FONT;
 

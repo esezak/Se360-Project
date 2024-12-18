@@ -1,4 +1,4 @@
-package com.esezak.server.Database.Management;
+package com.esezak.server.Database;
 
 import com.esezak.server.MovieLookup.Content.Content;
 

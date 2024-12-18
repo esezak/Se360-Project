@@ -1,8 +1,10 @@
 package com.esezak.server.MovieLookup.Content;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Review implements Serializable {
     private String username;
@@ -39,5 +41,23 @@ public class Review implements Serializable {
         else{
            return new Review(json.getString("username"), json.getInt("rating"));
         }
+    }
+    public JSONObject toJson() {
+        return toJson(this);
+    }
+    public static JSONObject toJson(Review review) {
+        JSONObject json = new JSONObject();
+        json.put("username", review.getUsername());
+        json.put("rating", review.getRating());
+        json.put("comment", review.getComment());
+        return json;
+    }
+    public static ArrayList<Review> fromJsonArray(String json) {
+        ArrayList<Review> reviews = new ArrayList<Review>();
+        JSONArray jsonArray = new JSONArray(json);
+        for (int i = 0; i < jsonArray.length(); i++) {
+            reviews.add(Review.parseJson(jsonArray.getJSONObject(i)));
+        }
+        return reviews;
     }
 }

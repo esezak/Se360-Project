@@ -1,5 +1,5 @@
 package com.esezak.server.MovieLookup.TVDB;
-import com.esezak.server.Database.Management.DBConnection;
+import com.esezak.server.Database.DBConnection;
 import com.esezak.server.MovieLookup.Content.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.*;

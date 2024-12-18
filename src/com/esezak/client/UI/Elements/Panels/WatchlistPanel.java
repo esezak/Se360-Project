@@ -1,5 +1,7 @@
 package com.esezak.client.UI.Elements.Panels;
 import com.esezak.client.UI.Elements.Buttons.SimpleButton;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import static com.esezak.client.UI.ClientMainWindow.GLOBAL_FONT;
 import javax.swing.*;
@@ -32,7 +34,7 @@ public class WatchlistPanel extends SimplePanel{
         }
         public void addRow(Object[] rowData) {
             data.add(rowData);
-            //fireTableRowsInserted(data.size() - 1, data.size() - 1);
+            fireTableRowsInserted(data.size() - 1, data.size() - 1);
         }
         public void removeSelectedRow(int row) {
             if (row >= 0 && row < data.size()) {
@@ -48,22 +50,28 @@ public class WatchlistPanel extends SimplePanel{
 
     private JTable table;
     private SimpleButton saveButton;
-    public WatchlistPanel(){
+    private String data;
+    public WatchlistPanel(String data){
         super();
-        int rowCount = 50;
+        this.data = data;
         WatchilstTableModel tableModel = new WatchilstTableModel();
-        Object[] rowData = {"Movie 1", "12.12.12", 10, "Watched"};
-        for(int i = 0; i < rowCount; i++){
-            tableModel.addRow(rowData);
+        JSONArray jsonArray = new JSONArray(data);
+        Object[] row = null;
+        for(int i = 0; i < jsonArray.length(); i++){
+            row = new Object[5];
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            row[0] = jsonObject.getString("movie_id");
+            row[1] = jsonObject.getString("title");
+            row[2] = jsonObject.getString("date_added");
+            row[3] = jsonObject.getInt("rating");
+            row[4] = jsonObject.getString("status");
+            tableModel.addRow(row);
         }
         table = new JTable(tableModel);
         table.setRowHeight(20);
-
-        saveButton = new SimpleButton("Save Watchlist");
         // Initializing the JTable
         table.setBackground(Color.gray);
         table.setFont(new Font(GLOBAL_FONT.getFontName(), Font.PLAIN, 23));
         panel.add(table, BorderLayout.NORTH);
-        panel.add(saveButton.getButton(), BorderLayout.SOUTH);
     }
 }

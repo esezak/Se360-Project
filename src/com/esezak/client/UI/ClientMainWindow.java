@@ -18,8 +18,8 @@ public class ClientMainWindow {
     public ServerConnection connection;
     public boolean isConencted = false;
     public boolean isLoggedIn = false;
-    public String username;
-    public String password;
+    private String username;
+    private String password;
 
 
     public ClientMainWindow() {
@@ -68,6 +68,23 @@ public class ClientMainWindow {
         bottomPanel = new BottomPanel();
         frame.getContentPane().add(bottomPanel.getPanel(), BorderLayout.SOUTH);
     }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public static class Launcher {
         public static void main(String[] args) {
             SwingUtilities.invokeLater(() -> {ClientMainWindow main = new ClientMainWindow();});

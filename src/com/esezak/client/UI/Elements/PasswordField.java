@@ -1,4 +1,4 @@
-package com.esezak.client.UI.Elements.TextFields;
+package com.esezak.client.UI.Elements;
 
 import javax.swing.*;
 

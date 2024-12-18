@@ -2,6 +2,7 @@ package com.esezak.client.UI.Elements.Panels;
 
 import com.esezak.client.UI.ClientMainWindow;
 import com.esezak.client.UI.Elements.Buttons.SimpleButton;
+import com.esezak.server.ConnectionManager.Response;
 import com.esezak.server.MovieLookup.Content.Content;
 
 import java.awt.*;
@@ -13,10 +14,12 @@ public class LeftPanel extends SimplePanel{
     public SimpleButton filmsButton;
     public SimpleButton watchlistButton;
     private CenterPanel centerPanel;
-    public ArrayList<Content> watchlist = null;
+    private ArrayList<Content> watchlist = null;
+    private ClientMainWindow clientMainWindow;
     public LeftPanel(ClientMainWindow clientMainWindow) {
         super();
         this.centerPanel = clientMainWindow.centerPanel;
+        this.clientMainWindow = clientMainWindow;
         filmsButton = new SimpleButton("Search Tab");
         filmsButton.getButton().addActionListener(new FilmsButtonListener());
         watchlistButton = new SimpleButton("Watchlist");
@@ -47,8 +50,13 @@ public class LeftPanel extends SimplePanel{
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            Response response = clientMainWindow.connection.sendWatchlistRequest(clientMainWindow.getUsername());
             centerPanel.getPanel().removeAll();
-            centerPanel.getPanel().add(new WatchlistPanel().getPanel());
+            String data = null;
+            if(response != null){
+                data = response.getData();
+            }
+            centerPanel.getPanel().add(new WatchlistPanel(data).getPanel());
             centerPanel.getPanel().revalidate();
         }
     }

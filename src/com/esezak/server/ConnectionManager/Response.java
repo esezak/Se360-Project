@@ -1,4 +1,4 @@
-package com.esezak.server.ConnectionManager.Responses;
+package com.esezak.server.ConnectionManager;
 
 import com.esezak.server.MovieLookup.Content.Content;
 import com.esezak.server.MovieLookup.Content.Review;
@@ -6,12 +6,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Response implements Serializable {
     private boolean status;
     private ArrayList<Content> movies = null;
-    private ArrayList<Review> reviews = null;
     private transient JSONObject json;
     private String data;
     private Content movie = null;
@@ -21,7 +21,7 @@ public class Response implements Serializable {
     public Response(boolean status, Content movie, ArrayList<Review> reviews) {
         this.status = status;
         this.movie = movie;
-        this.reviews = reviews;
+        setReviews(reviews);
     }
     public Response(boolean status, ArrayList<Content> movies) {
         this.status = status;
@@ -35,7 +35,8 @@ public class Response implements Serializable {
         return movies;
     }
     public ArrayList<Review> getReviews() {
-        return reviews;
+        return Review.fromJsonArray(data);
+
     }
     public Content getMovie() {
         return movie;
@@ -53,15 +54,29 @@ public class Response implements Serializable {
         System.out.println(data);
     }
 
+    public void tempReturnWatchlist(ArrayList<Content> movies) {//Should be converted to string
+        JSONObject row = null;
+        JSONArray movieArray = new JSONArray();
+        for (Content movie : movies) {
+            row = new JSONObject();
+            row.put("movie_id", movie.getId());
+            row.put("title", movie.getTitle());
+            //---------------------------------Replace with info from db//TODO
+            row.put("date_added", LocalDateTime.now().toString());
+            row.put("rating", 5);
+            row.put("status","watched");
+            //------------------------------------------------
+            movieArray.put(row);
+            System.out.println("Row added: " + row.toString());
+        }
+        System.out.println("final array: " + movieArray.toString());
+        this.data = movieArray.toString();
+    }
+    public JSONArray getWatchlist() {
+        return new JSONArray(data);
+    }
+
     public String getData() {
         return data;
-    }
-    public static void main(String[] args){
-        ArrayList<Review> reviews = new ArrayList<>();
-        for(int i = 0; i < 10; i++){
-            reviews.add(new Review("ege",10,"bruh"));
-        }
-        Response response = new Response(true);
-        response.setReviews(reviews);
     }
 }

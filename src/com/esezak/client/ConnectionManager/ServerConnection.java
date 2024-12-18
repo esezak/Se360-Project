@@ -1,12 +1,8 @@
 package com.esezak.client.ConnectionManager;
-import com.esezak.client.ConnectionManager.Requests.Request;
-import com.esezak.server.ConnectionManager.Responses.Response;
-import com.esezak.server.MovieLookup.Content.Content;
-import com.esezak.server.MovieLookup.Content.Review;
+import com.esezak.server.ConnectionManager.Response;
 
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
 
 public class ServerConnection {
     private String host;
@@ -57,8 +53,8 @@ public class ServerConnection {
                 return false;
             }else{
                 System.out.println(currentRequest.getRequestType()+" Successfully Sent");
+                return true;
             }
-            return true;
         } catch (IOException e) {
             System.err.println("Could not send "+ currentRequest.getRequestType() +" request");
             return false;
@@ -78,9 +74,14 @@ public class ServerConnection {
         }
         return null;
     }
-    public Response sendFilmQuery(String filmname){
+    public Response sendFilmQuery(String movieName){
         currentRequest = new Request();
-        currentRequest.search_movie(filmname);
+        currentRequest.search_movie(movieName);
+        return requestHandler(currentRequest);
+    }
+    public Response sendWatchlistRequest(String username){
+        currentRequest = new Request();
+        currentRequest.get_user_watchlist(username);
         return requestHandler(currentRequest);
     }
 

@@ -3,9 +3,9 @@ package com.esezak.client.UI.Elements.Panels;
 import com.esezak.client.ConnectionManager.ServerConnection;
 import com.esezak.client.UI.ClientMainWindow;
 import com.esezak.client.UI.Elements.Buttons.SimpleButton;
-import com.esezak.client.UI.Elements.Labels.SimpleLabel;
-import com.esezak.client.UI.Elements.TextFields.PasswordField;
-import com.esezak.client.UI.Elements.TextFields.SimpleTextField;
+import com.esezak.client.UI.Elements.SimpleLabel;
+import com.esezak.client.UI.Elements.PasswordField;
+import com.esezak.client.UI.Elements.SimpleTextField;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -112,8 +112,8 @@ public class RightPanel extends SimplePanel{
         public void actionPerformed(ActionEvent e) {
             if(connection.sendLoginRequest(usernameTextField.getText(), passwordField.getPassword())){
                 System.out.println("Logged in");
-                clientMainWindow.username = usernameTextField.getText();
-                clientMainWindow.password = passwordField.getPassword();
+                clientMainWindow.setUsername(usernameTextField.getText());
+                clientMainWindow.setPassword(passwordField.getPassword());
                 disconnectButton.getButton().setEnabled(false);
                 loginButton.getButton().setEnabled(false);
                 logoutButton.getButton().setEnabled(true);
@@ -135,8 +135,8 @@ public class RightPanel extends SimplePanel{
         public void actionPerformed(ActionEvent e) {
             if(connection.sendLogoutRequest()){
                 System.out.println("Logged out");
-                clientMainWindow.username = null;
-                clientMainWindow.password = null;
+                clientMainWindow.setUsername(null);
+                clientMainWindow.setPassword(null);
                 disconnectButton.getButton().setEnabled(true);
                 loginButton.getButton().setEnabled(true);
                 logoutButton.getButton().setEnabled(false);

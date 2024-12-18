@@ -1,12 +1,12 @@
 package com.esezak.server.ConnectionManager;
 
-import com.esezak.client.ConnectionManager.Requests.Request;
-import com.esezak.client.ConnectionManager.Requests.RequestType;
-import com.esezak.server.ConnectionManager.Responses.Response;
-import com.esezak.server.Database.Management.DBConnection;
+import com.esezak.client.ConnectionManager.Request;
+import com.esezak.client.ConnectionManager.RequestType;
+import com.esezak.server.Database.DBConnection;
 import com.esezak.server.MovieLookup.Content.Content;
 import com.esezak.server.MovieLookup.Content.Review;
 import com.esezak.server.MovieLookup.TVDB.TVDBSearcher;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -68,10 +68,31 @@ public class ConnectionThread extends Thread {
             case RequestType.ADD_MOVIE_TO_WATCHLIST -> handleAddMovieToWatchlist(request);
             case RequestType.RATE_MOVIE -> handleRateMovieRequest(request);
             case RequestType.SEARCH_MOVIE -> handleSearchMovie(request);
-            //case RequestType.GET_MOVIE_INFORMATION ->
+            case RequestType.GET_MOVIE_INFORMATION -> handleGetMovieRequest(request);
 
             default -> false;
         };
+    }
+
+    //TODO BORA
+    private boolean handleGetMovieRequest(Request request) throws IOException {
+        JSONObject json = new JSONObject(request.getData());
+        Content requestedContent = null;
+        ArrayList<Review> requestedMovieReviews = null;
+        try{
+            String movieID = (String) json.get("movie_id");
+            //TODO BORA
+            //Send -> "MovieID"
+            // Response -> Content + ArrayList<Review> ok | fail
+            // Get movie with the same movie id and return their respective reviews
+            currentResponse = new Response(true, requestedContent, requestedMovieReviews);
+            sendResponse();
+        } catch (JSONException e) {
+            System.err.println("Could not parse movie ID");
+            sendErrorResponse();
+            return false;
+        }
+        return false;
     }
 
     private boolean handleSearchMovie(Request request) throws IOException {
@@ -147,13 +168,16 @@ public class ConnectionThread extends Thread {
      */
     //TODO Boraaaa user watchlisti döndüren kod
     private boolean handleGetWatchlistRequest(Request request) throws IOException {
-        currentRequest = request;
         JSONObject requestData = new JSONObject(request.getData());
         String username = requestData.getString("username");
+        ArrayList<Content> tempwatchlist = TVDBSearcher.queryFromTVDB("Game");// fake watchlist
         if(!checkAuth(username)){
             sendErrorResponse();
             return false;
         }
+        currentResponse = new Response(true);
+        currentResponse.tempReturnWatchlist(tempwatchlist);
+        sendResponse();
         System.err.println("Not yet implemented");
         return false;
     }
@@ -266,6 +290,16 @@ public class ConnectionThread extends Thread {
     private void sendErrorResponse() throws IOException {
         System.err.println("Sent error response");
         currentResponse = new Response(false);
+        sendChannel.writeObject(currentResponse);
+    }
+
+    /**
+     * @throws IOException Sends the current response directly
+     * this is for sending prepared responses. <br>
+     * should not be used with error/ok responses.
+     */
+    private void sendResponse() throws IOException {
+        System.out.println("Sent response");
         sendChannel.writeObject(currentResponse);
     }
 

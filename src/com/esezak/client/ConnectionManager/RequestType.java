@@ -1,4 +1,4 @@
-package com.esezak.client.ConnectionManager.Requests;
+package com.esezak.client.ConnectionManager;
 
 public enum RequestType {
     //Requests

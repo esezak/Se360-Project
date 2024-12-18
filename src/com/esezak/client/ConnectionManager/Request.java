@@ -1,4 +1,4 @@
-package com.esezak.client.ConnectionManager.Requests;
+package com.esezak.client.ConnectionManager;
 
 import com.esezak.server.MovieLookup.Content.Review;
 import org.json.JSONObject;

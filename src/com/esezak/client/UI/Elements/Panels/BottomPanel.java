@@ -1,6 +1,6 @@
 package com.esezak.client.UI.Elements.Panels;
 
-import com.esezak.client.UI.Elements.Labels.SimpleLabel;
+import com.esezak.client.UI.Elements.SimpleLabel;
 
 import java.awt.*;
 
