@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="commons-logging-1.2-adapters">
+  <library name="commons-logging-1.2">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/commons-logging/commons-logging-1.2-adapters.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/commons-logging/commons-logging-1.2-api.jar!/" />
