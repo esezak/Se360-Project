@@ -6,6 +6,7 @@ import com.esezak.server.Database.DBConnection;
 import com.esezak.server.MovieLookup.Content.Content;
 import com.esezak.server.MovieLookup.Content.Review;
 import com.esezak.server.MovieLookup.TVDB.TVDBSearcher;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -14,6 +15,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
@@ -77,22 +79,36 @@ public class ConnectionThread extends Thread {
     //TODO BORA
     private boolean handleGetMovieReviews(Request request) throws IOException {
         JSONObject json = new JSONObject(request.getData());
-        Content requestedContent = null;
-        ArrayList<Review> requestedMovieReviews = null;
-        try{
-            String movieID = (String) json.get("movie_id");
-            //TODO BORA
-            //Send -> "MovieID"
-            // Response -> Content + ArrayList<Review> ok | fail
-            // Get movie with the same movie id and return their respective reviews
-            currentResponse = new Response(true, requestedContent, requestedMovieReviews);
-            sendResponse();
-        } catch (JSONException e) {
-            System.err.println("Could not parse movie ID");
+        String movieId = json.getString("movie_id");
+        Content c = null;
+        String query = """
+        SELECT username, comment, user_rating, review_date
+        FROM Reviews
+        WHERE movie_id = ?
+    """;
+        ArrayList<Review> reviews = new ArrayList<>();
+        try {
+            if (dbConnection != null) {
+                try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query)) {
+                    pstmt.setString(1, movieId);
+                    try (ResultSet rs = pstmt.executeQuery();) {
+                        while (rs.next()) {
+                            String username = rs.getString("username");
+                            int rating = rs.getInt("user_rating");
+                            String comment = rs.getString("comment");
+                            reviews.add(new Review(username, rating, comment));
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database Error: " + e.getMessage());
             sendErrorResponse();
             return false;
         }
-        return false;
+        currentResponse = new Response(true,c,reviews);
+        sendResponse();
+        return true;
     }
 
     private boolean handleSearchMovie(Request request) throws IOException {
@@ -170,16 +186,43 @@ public class ConnectionThread extends Thread {
     private boolean handleGetWatchlistRequest(Request request) throws IOException {
         JSONObject requestData = new JSONObject(request.getData());
         String username = requestData.getString("username");
-        ArrayList<Content> tempwatchlist = TVDBSearcher.queryFromTVDB("Game");// fake watchlist
-        if(!checkAuth(username)){
+        if (!checkAuth(username)) {
+            sendErrorResponse();
+            return false;
+        }
+        String query = """
+        SELECT m.title, w.date_added, w.user_rating, w.status
+        FROM Watchlist w
+        JOIN Movies m ON w.movie_id = m.movie_id
+        WHERE w.username = ?
+    """;
+        JSONArray watchlist = new JSONArray();
+        try {
+            if (dbConnection != null) {
+                try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query)) {
+                    pstmt.setString(1, username);
+                    try (ResultSet rs = pstmt.executeQuery()) {
+                        while (rs.next()) {
+                            JSONObject movieJson = new JSONObject();
+                            movieJson.put("title", rs.getString("title"));
+                            movieJson.put("date_added", rs.getString("date_added"));
+                            movieJson.put("user_rating", rs.getDouble("user_rating"));
+                            movieJson.put("status", rs.getString("status"));
+                            watchlist.put(movieJson);
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database Error: " + e.getMessage());
             sendErrorResponse();
             return false;
         }
         currentResponse = new Response(true);
-        currentResponse.tempReturnWatchlist(tempwatchlist);
+        currentResponse.tempReturnWatchlist(watchlist);
         sendResponse();
-        System.err.println("Not yet implemented");
-        return false;
+        System.out.println("Watchlist returned");
+        return true;
     }
 
     /**
