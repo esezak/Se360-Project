@@ -1,5 +1,6 @@
 package com.esezak.client.ConnectionManager;
 import com.esezak.server.ConnectionManager.Response;
+import com.esezak.server.MovieLookup.Content.Review;
 
 import java.io.*;
 import java.net.*;
@@ -79,7 +80,7 @@ public class ServerConnection {
         currentRequest.search_movie(movieName);
         return requestHandler(currentRequest);
     }
-    public Response sendWatchlistRequest(String username){
+    public Response getWatchlistRequest(String username){
         currentRequest = new Request();
         currentRequest.get_user_watchlist(username);
         return requestHandler(currentRequest);
@@ -95,15 +96,15 @@ public class ServerConnection {
         currentRequest.get_movie_information(movie_id);
         return requestHandler(currentRequest);
     }
+    public boolean sendRateMovieRequest(String movie_id,Review review){
+        currentRequest = new Request();
+        currentRequest.rate_movie(movie_id,review);
+        return responseHandler(currentRequest);
+    }
 
     public boolean sendAddToWatchListRequest(String movie_id, String username){
         currentRequest = new Request();
         currentRequest.add_movie_to_watchlist(movie_id, username);
-        return responseHandler(currentRequest);
-    }
-    public boolean getUserWatchlistRequest(String username){
-        currentRequest = new Request();
-        currentRequest.get_user_watchlist(username);
         return responseHandler(currentRequest);
     }
     public boolean sendDisconnectRequest(){
@@ -119,6 +120,11 @@ public class ServerConnection {
     public boolean sendLoginRequest(String username, String password){
         currentRequest = new Request();
         currentRequest.login(username,password);
+        return responseHandler(currentRequest);
+    }
+    public boolean sendUpdateWatchListRequest(String data){
+        currentRequest = new Request();
+        currentRequest.update_watchlist(data);
         return responseHandler(currentRequest);
     }
 

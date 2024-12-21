@@ -1,6 +1,7 @@
 package com.esezak.client.ConnectionManager;
 
 import com.esezak.server.MovieLookup.Content.Review;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -59,6 +60,11 @@ public class Request implements Serializable {
         requestType = RequestType.GET_MOVIE_INFORMATION;
         json.put("movie_id", movie_id);
         data = json.toString();
+    }
+    public void update_watchlist(String movie_data){
+        requestType = RequestType.UPDATE_WATCHLIST;
+        data = movie_data;
+        System.out.println(data);
     }
     public RequestType getRequestType() {
         return requestType;

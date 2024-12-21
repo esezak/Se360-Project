@@ -27,6 +27,19 @@ public enum RequestType {
         GET_MOVIE_INFORMATION,
         //Send -> "MovieID"
         // Response -> Content + ArrayList<Review> ok | fail
+        UPDATE_WATCHLIST,
+        //Send -> "username" + watchlistJson
+        //response -> ok | fail
 
 
-}
+}/*
+"""
+        INSERT INTO Reviews (username, movie_id, comment, user_rating, review_date)
+        VALUES (?, ?, ?, ?, datetime('now'))
+        ON CONFLICT(username, movie_id)
+        DO UPDATE SET
+            comment = excluded.comment,
+            user_rating = excluded.user_rating,
+            review_date = excluded.review_date
+    ""
+*/

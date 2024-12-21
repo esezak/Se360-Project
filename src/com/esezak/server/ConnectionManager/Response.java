@@ -13,15 +13,24 @@ public class Response implements Serializable {
     private boolean status;
     private ArrayList<Content> movies = null;
     private transient JSONObject json;
+    private transient JSONArray jsonArray;
     private String data;
-    private Content movie = null;
+    private transient Content movie = null;
     public Response(boolean status) {
         this.status = status;
     }
     public Response(boolean status, Content movie, ArrayList<Review> reviews) {
         this.status = status;
         this.movie = movie;
-        setReviews(reviews);
+        setReviews(reviews,true);
+    }
+    public Response(boolean status, ArrayList<Review> reviews, boolean withMovies) {
+        this.status = status;
+        setReviews(reviews,withMovies);
+    }
+    public Response(boolean status, String data) {
+        this.status = status;
+        this.data = data;
     }
     public Response(boolean status, ArrayList<Content> movies) {
         this.status = status;
@@ -41,16 +50,24 @@ public class Response implements Serializable {
     public Content getMovie() {
         return movie;
     }
-    public void setReviews(ArrayList<Review> reviews) {
-        JSONArray reviewArray = new JSONArray();
-        JSONObject row = new JSONObject();
+    private void setMovie(Content movie) {
+        jsonArray = new JSONArray();
+        jsonArray.put(movie.toJsonString());
+    }
+
+    public void setReviews(ArrayList<Review> reviews,boolean withMovie) {
+        if(!withMovie){
+            jsonArray = new JSONArray();
+        }
+        JSONObject row;
         for (Review review : reviews) {
+            row = new JSONObject();
             row.put("username", review.getUsername());
             row.put("rating", review.getRating());
             row.put("comment", review.getComment());
-            reviewArray.put(row);
+            jsonArray.put(row);
         }
-        this.data = reviewArray.toString();
+        this.data = jsonArray.toString();
         System.out.println(data);
     }
 

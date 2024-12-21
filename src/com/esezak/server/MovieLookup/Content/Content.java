@@ -119,6 +119,9 @@ public class Content implements Serializable {
         jsonObject.put("total_rating", content.getTotal_rating());
         return jsonObject;
     }
+    public String toJsonString() {
+        return toJsonObject(this).toString();
+    }
     public static ArrayList<Content> fromJsonArray(String data) {
         JSONArray jsonArray = new JSONArray(data);
         ArrayList<Content> contents = new ArrayList<>();

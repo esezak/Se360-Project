@@ -48,6 +48,7 @@ public class TopPanel extends SimplePanel {
                 centerPanel.setFilms(connection.sendFilmQuery(searchTextField.getText()).getMovies());
             }
             centerPanel.retrieveNewFilms();
+
         }
     }
 

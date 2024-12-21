@@ -7,7 +7,6 @@ import com.esezak.server.MovieLookup.Content.Content;
 import com.esezak.server.MovieLookup.Content.Review;
 import com.esezak.server.MovieLookup.TVDB.TVDBSearcher;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -18,7 +17,6 @@ import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 
@@ -68,20 +66,21 @@ public class ConnectionThread extends Thread {
             case RequestType.LOGOUT -> handleLogoutRequest();
             case RequestType.DISCONNECT -> handleDisconnectRequest();
             case RequestType.GET_USER_WATCHLIST -> handleGetWatchlistRequest(request);
-            case RequestType.ADD_MOVIE_TO_WATCHLIST -> handleAddMovieToWatchlist(request);
+            case RequestType.ADD_MOVIE_TO_WATCHLIST -> handleAddMovieToWatchlistRequest(request);
             case RequestType.RATE_MOVIE -> handleRateMovieRequest(request);
-            case RequestType.SEARCH_MOVIE -> handleSearchMovie(request);
-            case RequestType.GET_MOVIE_INFORMATION -> handleGetMovieReviews(request);
+            case RequestType.SEARCH_MOVIE -> handleSearchMovieRequest(request);
+            case RequestType.GET_MOVIE_INFORMATION -> handleGetMovieInformationRequest(request);
+            case RequestType.UPDATE_WATCHLIST -> handleUpdateWatchlistRequest(request);
 
             default -> false;
         };
     }
 
-    //TODO BORA
-    private boolean handleGetMovieReviews(Request request) throws IOException {
+
+
+    private boolean handleGetMovieInformationRequest(Request request) throws IOException {
         JSONObject json = new JSONObject(request.getData());
         String movieId = json.getString("movie_id");
-        Content c = null;
         String query = """
         SELECT username, comment, user_rating, review_date
         FROM Reviews
@@ -97,6 +96,7 @@ public class ConnectionThread extends Thread {
                             String username = rs.getString("username");
                             int rating = rs.getInt("user_rating");
                             String comment = rs.getString("comment");
+                            System.out.println("Added: "+username + " " + rating + " " + comment);
                             reviews.add(new Review(username, rating, comment));
                         }
                     }
@@ -107,12 +107,12 @@ public class ConnectionThread extends Thread {
             sendErrorResponse();
             return false;
         }
-        currentResponse = new Response(true,c,reviews);
+        currentResponse = new Response(true,reviews,false);
         sendResponse();
         return true;
     }
 
-    private boolean handleSearchMovie(Request request) throws IOException {
+    private boolean handleSearchMovieRequest(Request request) throws IOException {
         JSONObject requestData = new JSONObject(request.getData());
         String movieName = requestData.getString("movie_name");
         try{
@@ -183,7 +183,6 @@ public class ConnectionThread extends Thread {
      * Response.movies
      * @throws IOException
      */
-    //TODO Boraaaa user watchlisti döndüren kod
     private boolean handleGetWatchlistRequest(Request request) throws IOException {
         JSONObject requestData = new JSONObject(request.getData());
         String username = requestData.getString("username");
@@ -192,12 +191,12 @@ public class ConnectionThread extends Thread {
             return false;
         }
         String query = """
-        SELECT m.title, w.date_added, w.user_rating, w.status
+        SELECT m.movie_id, m.title, w.date_added, w.user_rating, w.status
         FROM Watchlist w
         JOIN Movies m ON w.movie_id = m.movie_id
         WHERE w.username = ?
     """;
-        JSONArray watchlist = new JSONArray();
+        JSONArray watchlistJson = new JSONArray();
         try {
             if (dbConnection != null) {
                 try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query)) {
@@ -205,11 +204,12 @@ public class ConnectionThread extends Thread {
                     try (ResultSet rs = pstmt.executeQuery()) {
                         while (rs.next()) {
                             JSONObject movieJson = new JSONObject();
+                            movieJson.put("movie_id", rs.getString("movie_id"));
                             movieJson.put("title", rs.getString("title"));
                             movieJson.put("date_added", rs.getString("date_added"));
                             movieJson.put("user_rating", rs.getDouble("user_rating"));
                             movieJson.put("status", rs.getString("status"));
-                            watchlist.put(movieJson);
+                            watchlistJson.put(movieJson);
                         }
                     }
                 }
@@ -219,12 +219,54 @@ public class ConnectionThread extends Thread {
             sendErrorResponse();
             return false;
         }
-        currentResponse = new Response(true);
-        currentResponse.tempReturnWatchlist(watchlist);
+        currentResponse = new Response(true,watchlistJson.toString());
         sendResponse();
         System.out.println("Watchlist returned");
         return true;
     }
+
+    private boolean handleUpdateWatchlistRequest(Request request) throws IOException {
+        JSONArray requestData = new JSONArray(request.getData());
+        String username = requestData.getJSONObject(0).getString("username");
+        if(!checkAuth(username)){
+            sendErrorResponse();
+            return false;
+        }
+        for(int i = 1; i < requestData.length(); i++){
+            String movieId = (String) requestData.getJSONObject(i).get("movie_id");
+            String title = (String) requestData.getJSONObject(i).get("title");
+            String dateAdded = (String) requestData.getJSONObject(i).get("date_added");
+            int userRating = (Integer) requestData.getJSONObject(i).get("user_rating");
+            String status = (String) requestData.getJSONObject(i).get("status");
+            String query = """
+                            INSERT INTO Watchlist (username, movie_id, date_added, user_rating, status)
+                            VALUES (?, ?, ?, ?, ?)
+                            ON CONFLICT (username, movie_id)
+                            DO UPDATE SET username = excluded.username,movie_id = excluded.movie_id, date_added = excluded.date_added, user_rating = excluded.user_rating, status = excluded.status
+                            """;
+            try{
+                if (dbConnection != null) {
+                    try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query)) {
+                        pstmt.setString(1, username);
+                        pstmt.setString(2, movieId);
+                        pstmt.setString(3, dateAdded);
+                        pstmt.setInt(4, userRating);
+                        pstmt.setString(5, status);
+                        pstmt.executeUpdate();
+                    }
+                }
+            } catch (SQLException e) {
+                System.err.println("Database Error: " + e.getMessage());
+                sendErrorResponse();
+                return false;
+            }
+            System.out.println("Updated Watchlist Element");
+        }
+        sendOkResponse();
+        return false;
+
+    }
+
 
     /**
      * checks if the user is logged in and if the movie request is already in the users watchlist. <br>
@@ -233,7 +275,7 @@ public class ConnectionThread extends Thread {
      * @return true if the movie is added successfully
      * @throws IOException
      */
-    private boolean handleAddMovieToWatchlist(Request request) throws IOException {
+    private boolean handleAddMovieToWatchlistRequest(Request request) throws IOException {
         JSONObject requestData = new JSONObject(request.getData());
         String movieId = requestData.getString("movie_id");
         String username = requestData.getString("username");
@@ -242,7 +284,7 @@ public class ConnectionThread extends Thread {
             return false;
         }
         String query = "INSERT INTO Watchlist (username, movie_id, date_added, user_rating, status) "
-                + "VALUES (?, ?, datetime('now'), NULL, 'Watching')";
+                + "VALUES (?, ?, datetime('now'), NULL, 'Plan to Watch')";
         try{
             if (dbConnection != null) {
                 if (dbConnection.isMovieInWatchlist(username, movieId)) {

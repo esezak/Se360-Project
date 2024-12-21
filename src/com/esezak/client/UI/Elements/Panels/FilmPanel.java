@@ -3,6 +3,7 @@ package com.esezak.client.UI.Elements.Panels;
 import com.esezak.client.UI.ClientMainWindow;
 import com.esezak.client.UI.Elements.Buttons.SimpleButton;
 import com.esezak.client.UI.Elements.SimpleLabel;
+import com.esezak.server.ConnectionManager.Response;
 import com.esezak.server.MovieLookup.Content.Content;
 import com.esezak.server.MovieLookup.Content.Review;
 
@@ -10,6 +11,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import static com.esezak.client.UI.ClientMainWindow.GLOBAL_FONT;
 
 public class FilmPanel extends SimplePanel {
     private SimplePanel filmDetailsPanel;
@@ -18,15 +22,23 @@ public class FilmPanel extends SimplePanel {
     public Content film;
     private String infoString;
     SimplePanel userInputHolderPanel;
-
+    Integer[] ratings = {0,1,2,3,4,5,6,7,8,9,10};
+    private JComboBox<Integer> ratingsComboBox;
     private SimplePanel buttonsPanel;
     public SimpleButton commentButton;
     public SimpleButton addToWatchListButton;
     ClientMainWindow clientMainWindow;
+    JTextArea reviewTextArea;
+    int userRating;
+    private Review review;
 
     public FilmPanel(Content film, ImageIcon icon, ClientMainWindow clientMainWindow) {
         super();
         this.clientMainWindow = clientMainWindow;
+        this.ratingsComboBox = new JComboBox<>(ratings);
+        ratingsComboBox.setSelectedIndex(0);
+        userRating = ratingsComboBox.getItemAt(ratingsComboBox.getSelectedIndex());
+        ratingsComboBox.setFont(GLOBAL_FONT);
         ImageIcon addIcon = new ImageIcon("src/com/esezak/client/UI/Elements/Buttons/Icons/add.png");
         this.film = film;
         infoString = "<html><body><div><h2>"+film.getTitle()+"</h2>"+
@@ -38,20 +50,19 @@ public class FilmPanel extends SimplePanel {
         scrollPane.setViewportView(panel);
         scrollPane.createVerticalScrollBar();
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
-        ;
+
         //----------------------------------------------
         filmDetailsPanel = new SimplePanel();
-        SimpleLabel label = new SimpleLabel(icon,infoString);
+        SimpleLabel label = new SimpleLabel(icon,infoString);//Movie details
         label.getLabel().setIconTextGap(10);
         filmDetailsPanel.getPanel().add(label.getLabel(),BorderLayout.NORTH);
         panel.add(filmDetailsPanel.getPanel(),BorderLayout.NORTH);
 
-
         userInputHolderPanel = new SimplePanel();
-
+        //------------Write Comment Section----------------
         commentButton = new SimpleButton("Write a comment");
         commentButton.getButton().setBorder(BorderFactory.createLineBorder(Color.black));
-
+            //--------------Add to watchlist button--------------
         addToWatchListButton = new SimpleButton("Add to watch list");
         addToWatchListButton.getButton().setIcon(addIcon);
         addToWatchListButton.getButton().setBorder(BorderFactory.createLineBorder(Color.black));
@@ -67,8 +78,11 @@ public class FilmPanel extends SimplePanel {
         reviewsPanel = new SimplePanel();
         reviewsPanel.getPanel().setLayout(new GridLayout(0,1));
         commentButton.getButton().addActionListener(new onReviewButtonClick());
-        for(int i = 0; i < 10; i++){
-            addReview(new Review("Default User",4,"this is the comment we have all been waiting for this might be heaven or this could be hell, this comment is very loong and we don't know what is going to happen, anything could happen right"));
+        Response response = clientMainWindow.connection.getFilmInformation(film.getId());
+        System.out.println(response.getData());
+        ArrayList<Review> reviews = response.getReviews();
+        for(int i = 0; i < reviews.size(); i++){
+            addReview(reviews.get(i));
         }
         panel.add(reviewsPanel.getPanel(),BorderLayout.SOUTH);
 
@@ -93,15 +107,20 @@ public class FilmPanel extends SimplePanel {
     }
     private class onReviewButtonClick implements ActionListener {
 
+
         @Override
         public void actionPerformed(ActionEvent e) {
             SimplePanel reviewPanel = new SimplePanel();
+            SimplePanel submitAndRatingPanel = new SimplePanel();
             SimpleButton submitButton = new SimpleButton("Submit");
+            submitButton.getButton().addActionListener(new onSubmitButtonClick());
             SimpleLabel reviewLabel = new SimpleLabel("Review:");
-            JTextArea reviewTextArea = new JTextArea();
+            reviewTextArea = new JTextArea();
+            submitAndRatingPanel.getPanel().add(submitButton.getButton(), BorderLayout.EAST);
+            submitAndRatingPanel.getPanel().add(ratingsComboBox, BorderLayout.CENTER);
             reviewPanel.getPanel().add(reviewLabel.getLabel(),BorderLayout.NORTH);
             reviewPanel.getPanel().add(reviewTextArea,BorderLayout.CENTER);
-            reviewPanel.getPanel().add(submitButton.getButton(),BorderLayout.EAST);
+            reviewPanel.getPanel().add(submitAndRatingPanel.getPanel(),BorderLayout.EAST);
             userInputHolderPanel.getPanel().add(reviewPanel.getPanel(),BorderLayout.CENTER);
             clientMainWindow.centerPanel.getPanel().revalidate();
         }
@@ -117,5 +136,23 @@ public class FilmPanel extends SimplePanel {
             }
         }
     }
+    private class onSubmitButtonClick implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("Submitting button");
+            review = getReview();
+            System.out.println("Review: "+review.toJson());
+            clientMainWindow.connection.sendRateMovieRequest(film.getId(),review);
+        }
+        public Review getReview() {
+            String comment = reviewTextArea.getText();
+            int rating = ratingsComboBox.getSelectedIndex();
+            String username = clientMainWindow.getUsername();
+            return new Review(username,rating,comment);
+        }
+
+    }
+
 
 }

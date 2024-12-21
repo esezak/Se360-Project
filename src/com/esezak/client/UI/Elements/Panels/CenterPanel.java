@@ -30,7 +30,7 @@ public class CenterPanel extends SimplePanel implements Runnable{
 
     public void retrieveNewFilms() {
         panel.removeAll();
-        Thread t;
+        Thread t = null;
         for(Content c : films){
             toBeAdded = c;
             t = new Thread(this);
@@ -41,6 +41,7 @@ public class CenterPanel extends SimplePanel implements Runnable{
                 throw new RuntimeException(e);
             }
         }
+
     }
     public void retrieveOldFilms() {
         panel.removeAll();

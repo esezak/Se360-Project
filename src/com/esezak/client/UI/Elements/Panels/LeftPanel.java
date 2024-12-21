@@ -50,13 +50,13 @@ public class LeftPanel extends SimplePanel{
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Response response = clientMainWindow.connection.sendWatchlistRequest(clientMainWindow.getUsername());
+            Response response = clientMainWindow.connection.getWatchlistRequest(clientMainWindow.getUsername());
             centerPanel.getPanel().removeAll();
             String data = null;
             if(response != null){
                 data = response.getData();
             }
-            centerPanel.getPanel().add(new WatchlistPanel(data).getPanel());
+            centerPanel.getPanel().add(new WatchlistPanel(data,clientMainWindow).getPanel());
             centerPanel.getPanel().revalidate();
         }
     }
