@@ -79,10 +79,39 @@ public class ConnectionThread extends Thread {
 
 
     //TODO BORA
-    private boolean handleDeleteMovieFromWatchlistRequest(Request request) {
+    private boolean handleDeleteMovieFromWatchlistRequest(Request request) throws IOException {
+        JSONObject requestData = new JSONObject(request.getData());
+        String username = requestData.getString("username");
+        String movieId = requestData.getString("movie_id");
+        if (!checkAuth(username)) {
+            sendErrorResponse();
+            return false;
+        }
+        String query = "DELETE FROM Watchlist WHERE username = ? AND movie_id = ?";
+        try {
+            if (dbConnection != null) {
+                try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query)) {
+                    pstmt.setString(1, username);
+                    pstmt.setString(2, movieId);
+                    int rows = pstmt.executeUpdate();
+                    if (rows > 0) {
+                        sendOkResponse();
+                        System.out.println("Movie deleted from watchlist");
+                        return true;
+                    } else {
+                        System.err.println("Movie not found");
+                        sendErrorResponse();
+                        return false;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database Error: " + e.getMessage());
+            sendErrorResponse();
+            return false;
+        }
         return false;
     }
-
 
     private boolean handleGetMovieInformationRequest(Request request) throws IOException {
         JSONObject json = new JSONObject(request.getData());
@@ -234,24 +263,27 @@ public class ConnectionThread extends Thread {
     private boolean handleUpdateWatchlistRequest(Request request) throws IOException {
         JSONArray requestData = new JSONArray(request.getData());
         String username = requestData.getJSONObject(0).getString("username");
-        if(!checkAuth(username)){
+        if (!checkAuth(username)) {
             sendErrorResponse();
             return false;
         }
-        for(int i = 1; i < requestData.length(); i++){
-            String movieId = (String) requestData.getJSONObject(i).get("movie_id");
-            String title = (String) requestData.getJSONObject(i).get("title");
-            String dateAdded = (String) requestData.getJSONObject(i).get("date_added");
-            int userRating = (Integer) requestData.getJSONObject(i).get("user_rating");
-            String status = (String) requestData.getJSONObject(i).get("status");
-            String query = """
-                            INSERT INTO Watchlist (username, movie_id, date_added, user_rating, status)
-                            VALUES (?, ?, ?, ?, ?)
-                            ON CONFLICT (username, movie_id)
-                            DO UPDATE SET username = excluded.username,movie_id = excluded.movie_id, date_added = excluded.date_added, user_rating = excluded.user_rating, status = excluded.status
-                            """;
-            try{
-                if (dbConnection != null) {
+        String query = """
+        INSERT INTO Watchlist (username, movie_id, date_added, user_rating, status)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT (username, movie_id)
+        DO UPDATE SET 
+            date_added = excluded.date_added, 
+            user_rating = excluded.user_rating, 
+            status = excluded.status
+    """;
+        try {
+            if (dbConnection != null) {
+                for (int i = 1; i < requestData.length(); i++) {
+                    JSONObject movieData = requestData.getJSONObject(i);
+                    String movieId = movieData.getString("movie_id");
+                    String dateAdded = movieData.getString("date_added");
+                    int userRating = movieData.getInt("user_rating");
+                    String status = movieData.getString("status");
                     try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query)) {
                         pstmt.setString(1, username);
                         pstmt.setString(2, movieId);
@@ -261,18 +293,16 @@ public class ConnectionThread extends Thread {
                         pstmt.executeUpdate();
                     }
                 }
-            } catch (SQLException e) {
-                System.err.println("Database Error: " + e.getMessage());
-                sendErrorResponse();
-                return false;
             }
-            System.out.println("Updated Watchlist Element");
+        } catch (SQLException e) {
+            System.err.println("Database Error: " + e.getMessage());
+            sendErrorResponse();
+            return false;
         }
+        System.out.println("Updated watchlist");
         sendOkResponse();
-        return false;
-
+        return true;
     }
-
 
     /**
      * checks if the user is logged in and if the movie request is already in the users watchlist. <br>
