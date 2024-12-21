@@ -55,10 +55,56 @@ public class DB_Init {
                 FOREIGN KEY (movie_id) REFERENCES Movies(movie_id)
             );
         """;
+                String createTriggerWatchlistOnReview1 = """
+                CREATE TRIGGER IF NOT EXISTS UpdateWatchlistOnReviewChange1
+                AFTER INSERT ON Reviews
+                FOR EACH ROW
+                BEGIN
+                    UPDATE Watchlist
+                    SET user_rating = NEW.user_rating
+                    WHERE username = NEW.username AND movie_id = NEW.movie_id;
+                END;
+            """;
+                String createTriggerWatchlistOnReview2 = """
+                CREATE TRIGGER IF NOT EXISTS UpdateWatchlistOnReviewChange2
+                AFTER UPDATE ON Reviews
+                FOR EACH ROW
+                BEGIN
+                    UPDATE Watchlist
+                    SET user_rating = NEW.user_rating
+                    WHERE username = NEW.username AND movie_id = NEW.movie_id;
+                END;
+            """;
+                String createTriggerReviewOnWatchlist1 = """
+                CREATE TRIGGER IF NOT EXISTS UpdateReviewOnWatchlistChange1
+                AFTER INSERT ON Watchlist
+                FOR EACH ROW
+                BEGIN
+                    INSERT INTO Reviews (username, movie_id, user_rating, review_date, comment)
+                    VALUES (NEW.username, NEW.movie_id, NEW.user_rating, DATE('now'), 'From Watchlist')
+                    ON CONFLICT (username, movie_id)
+                    DO UPDATE SET user_rating = NEW.user_rating;
+                END;
+            """;
+                String createTriggerReviewOnWatchlist2 = """
+                CREATE TRIGGER IF NOT EXISTS UpdateReviewOnWatchlistChange2
+                AFTER UPDATE ON Watchlist
+                FOR EACH ROW
+                BEGIN
+                    INSERT INTO Reviews (username, movie_id, user_rating, review_date, comment)
+                    VALUES (NEW.username, NEW.movie_id, NEW.user_rating, DATE('now'), 'From Watchlist')
+                    ON CONFLICT (username, movie_id)
+                    DO UPDATE SET user_rating = NEW.user_rating;
+                END;
+            """;
                 statement.executeUpdate(createUsersTable);
                 statement.executeUpdate(createMoviesTable);
                 statement.executeUpdate(createReviewsTable);
                 statement.executeUpdate(createWatchlistTable);
+                statement.executeUpdate(createTriggerWatchlistOnReview1);
+                statement.executeUpdate(createTriggerWatchlistOnReview2);
+                statement.executeUpdate(createTriggerReviewOnWatchlist1);
+                statement.executeUpdate(createTriggerReviewOnWatchlist2);
             } catch (SQLException e) {
                 e.printStackTrace();
             } finally {
