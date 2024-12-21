@@ -71,11 +71,17 @@ public class ConnectionThread extends Thread {
             case RequestType.SEARCH_MOVIE -> handleSearchMovieRequest(request);
             case RequestType.GET_MOVIE_INFORMATION -> handleGetMovieInformationRequest(request);
             case RequestType.UPDATE_WATCHLIST -> handleUpdateWatchlistRequest(request);
+            case RequestType.DELETE_MOVIE_FROM_WATCHLIST -> handleDeleteMovieFromWatchlistRequest(request);
 
             default -> false;
         };
     }
 
+
+    //TODO BORA
+    private boolean handleDeleteMovieFromWatchlistRequest(Request request) {
+        return false;
+    }
 
 
     private boolean handleGetMovieInformationRequest(Request request) throws IOException {

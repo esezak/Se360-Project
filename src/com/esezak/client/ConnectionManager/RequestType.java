@@ -30,16 +30,8 @@ public enum RequestType {
         UPDATE_WATCHLIST,
         //Send -> "username" + watchlistJson
         //response -> ok | fail
+        DELETE_MOVIE_FROM_WATCHLIST,
+        //Send -> "username" + movieID
+        //response -> ok |fail
 
-
-}/*
-"""
-        INSERT INTO Reviews (username, movie_id, comment, user_rating, review_date)
-        VALUES (?, ?, ?, ?, datetime('now'))
-        ON CONFLICT(username, movie_id)
-        DO UPDATE SET
-            comment = excluded.comment,
-            user_rating = excluded.user_rating,
-            review_date = excluded.review_date
-    ""
-*/
+}
