@@ -97,6 +97,7 @@ public class ConnectionThread extends Thread {
                     if (rows > 0) {
                         sendOkResponse();
                         System.out.println("Movie deleted from watchlist");
+                        setRating(movieId);
                         return true;
                     } else {
                         System.err.println("Movie not found");
@@ -297,6 +298,7 @@ public class ConnectionThread extends Thread {
                         pstmt.setInt(4, userRating);
                         pstmt.setString(5, status);
                         pstmt.executeUpdate();
+                        setRating(movieId);
                     }
                 }
             }
@@ -398,8 +400,33 @@ public class ConnectionThread extends Thread {
         }
         sendOkResponse();
         System.out.println("Movie rated");
+        setRating(movieId);
         return true;
     }
+    private void setRating(String movieId){
+        String query = "SELECT AVG(user_rating) AS average_rating FROM Reviews WHERE movie_id = ?";
+        String query2 = "UPDATE Movies SET rating = ? WHERE movie_id = ?";
+        double averageRating = 0;
+        try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query)) {
+            pstmt.setString(1, movieId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    averageRating = rs.getDouble("average_rating");
+                    System.out.println("Avg rating for "+movieId+": "+averageRating);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database Error: " + e.getMessage());
+        }
+        try(PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query2)) {
+            pstmt.setDouble(1, averageRating);
+            pstmt.setString(2, movieId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     /**
      * Sends ok response if everything is in order

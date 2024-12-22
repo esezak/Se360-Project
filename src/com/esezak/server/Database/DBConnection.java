@@ -98,18 +98,31 @@ public class DBConnection {
             }
         }
     }
-    public double getRating(String movieId) {
-        String query = "SELECT AVG(user_rating) AS average_rating FROM Reviews WHERE movie_id = ?";
-        try (PreparedStatement pstmt = dbConnection.prepareStatement(query)) {
-            pstmt.setString(1, movieId);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getDouble("average_rating");
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Database Error: " + e.getMessage());
-        }
-        return 0.0;
-    }
+//    public void setRating(String movieId){
+//        String query = "SELECT AVG(user_rating) AS average_rating FROM Reviews WHERE movie_id = ?";
+//        //String query2 = "UPDATE Movies SET rating = ? WHERE movie_id = ?";
+//        double averageRating = 0;
+//        try (PreparedStatement pstmt = dbConnection.prepareStatement(query)) {
+//            pstmt.setString(1, movieId);
+//            try (ResultSet rs = pstmt.executeQuery()) {
+//                if (rs.next()) {
+//                    averageRating = rs.getDouble("average_rating");
+//                }
+//            }
+//        } catch (SQLException e) {
+//            System.err.println("Database Error: " + e.getMessage());
+//        }
+//        try(PreparedStatement pstmt = dbConnection.prepareStatement(query2)){
+//            pstmt.setDouble(1, averageRating);
+//            pstmt.setString(2, movieId);
+//            try{
+//                ResultSet rs = pstmt.executeQuery();
+//            } catch (SQLException e) {
+//                throw new RuntimeException(e);
+//            }
+//            return averageRating;
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 }
