@@ -12,6 +12,9 @@ public enum RequestType {
             DISCONNECT,
             //Send -> Request Type (get)
             // Response -> ok | fail
+            SIGNUP,
+            // Send -> username + passowrd
+            // Response -> ok | fail
             GET_USER_WATCHLIST,
             //Send -> Request Type (get)
             // Response -> ArrayList<Content> ok | fail if not logged in
