@@ -2,6 +2,7 @@ package com.esezak.client.UI;
 
 import com.esezak.client.ConnectionManager.ServerConnection;
 import com.esezak.client.UI.Elements.Panels.*;
+import com.esezak.client.UI.Elements.SimpleLabel;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -88,6 +89,15 @@ public class ClientMainWindow {
     public static class Launcher {
         public static void main(String[] args) {
             SwingUtilities.invokeLater(() -> {ClientMainWindow main = new ClientMainWindow();});
+        }
+    }
+    private static class BottomPanel extends SimplePanel {
+        public BottomPanel() {
+            super();
+            getPanel().setLayout(new FlowLayout(FlowLayout.RIGHT));
+            SimpleLabel label = new SimpleLabel("Powered By: TVDB.com");
+            label.getLabel().setForeground(Color.BLUE);
+            getPanel().add(label.getLabel());
         }
     }
 }

@@ -64,7 +64,12 @@ public class Request implements Serializable {
     public void update_watchlist(String movie_data){
         requestType = RequestType.UPDATE_WATCHLIST;
         data = movie_data;
-        System.out.println(data);
+    }
+    public void delete_from_watchlist(String movie_id, String username){
+        json = new JSONObject();
+        json.put("movie_id", movie_id);
+        json.put("username", username);
+        data = json.toString();
     }
     public RequestType getRequestType() {
         return requestType;

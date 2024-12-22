@@ -12,20 +12,19 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class FilmButton extends SimpleButton {
-
-
-    ImageIcon icon;
+    private ImageIcon icon;
     private Content film;
     private CenterPanel centerPanel;
     private String infoString;
-    public FilmButton(Content film, CenterPanel centerPanel) {
+    private FilmPanel filmPanel;
+    public FilmButton(Content movie, CenterPanel centerPanel) {
         super("text");
-        this.film = film;
+        this.film = movie;
         this.centerPanel = centerPanel;
-        infoString = "<html><body><h2>"+film.getTitle()+"</h2>"+
-                "<p style=\"font-size:8px\">Genres: "+film.getGenres()+"</p>"+
-                "<p style=\"font-size:8px\">Overview: "+ formatLongText()+"</p>"+
-                "<p>Rating: "+film.getAvg_rating()+"</p></body></html>";
+        infoString = "<html><body><h2>"+movie.getTitle()+"</h2>"+
+                "<p style=\"font-size:11px\">Genres: "+movie.getGenres()+"</p>"+
+                "<p style=\"font-size:11px\">Overview: "+ formatLongText()+"</p>"+
+                "<p>Rating: "+movie.getAvg_rating()+"</p></body></html>";
         button.setText(infoString);
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setVerticalTextPosition(SwingConstants.NORTH);
@@ -64,9 +63,11 @@ public class FilmButton extends SimpleButton {
         @Override
         public void actionPerformed(ActionEvent e) {
             centerPanel.getPanel().removeAll();
-            FilmPanel filmPanel = new FilmPanel(film,icon, centerPanel.getClientMainWindow());
-            filmPanel.addToWatchListButton.getButton().setEnabled(centerPanel.getClientMainWindow().isLoggedIn);
-            filmPanel.commentButton.getButton().setEnabled(centerPanel.getClientMainWindow().isLoggedIn);
+            if(filmPanel == null){
+                filmPanel = new FilmPanel(film,icon, centerPanel.getClientMainWindow());
+            }
+            filmPanel.initialize();
+            filmPanel.setReviewButtonStates();
             centerPanel.getPanel().add(filmPanel.getPanel());
             centerPanel.getPanel().revalidate();
         }

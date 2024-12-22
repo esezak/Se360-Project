@@ -4,12 +4,14 @@ import com.esezak.client.ConnectionManager.ServerConnection;
 import com.esezak.client.UI.ClientMainWindow;
 import com.esezak.client.UI.Elements.Buttons.SimpleButton;
 import com.esezak.client.UI.Elements.SimpleLabel;
-import com.esezak.client.UI.Elements.PasswordField;
 import com.esezak.client.UI.Elements.SimpleTextField;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import static com.esezak.client.UI.ClientMainWindow.GLOBAL_FONT;
 
 public class RightPanel extends SimplePanel{
     private SimplePanel rightFormPanel;
@@ -20,7 +22,7 @@ public class RightPanel extends SimplePanel{
     private SimpleLabel loginLabel = new SimpleLabel("Login Status:");
     public SimpleLabel loginStatusLabel = new SimpleLabel("Not Logged in");
     public SimpleTextField usernameTextField = new SimpleTextField();
-    public PasswordField passwordField = new PasswordField();
+    private JPasswordField passwordField;
     public SimpleButton connectButton = new SimpleButton("Connect");
     public SimpleButton disconnectButton = new SimpleButton("Disconnect");
     public SimpleButton loginButton = new SimpleButton("Login");
@@ -33,6 +35,8 @@ public class RightPanel extends SimplePanel{
         super();
         rightFormPanel = new SimplePanel();
         panel.setLayout(new GridLayout(3,1));
+        passwordField = new JPasswordField();
+        passwordField.setFont(GLOBAL_FONT);
         this.connection = clientMainWindow.connection;
         this.topPanel = clientMainWindow.topPanel;
         this.leftPanel = clientMainWindow.leftPanel;
@@ -42,7 +46,7 @@ public class RightPanel extends SimplePanel{
         this.rightFormPanel.getPanel().add(usernameLabel.getLabel());
         this.rightFormPanel.getPanel().add(usernameTextField.getTextField());
         this.rightFormPanel.getPanel().add(passwordLabel.getLabel());
-        this.rightFormPanel.getPanel().add(passwordField.getPasswordField());
+        this.rightFormPanel.getPanel().add(passwordField);
         this.rightFormPanel.getPanel().add(connectButton.getButton());
         this.rightFormPanel.getPanel().add(disconnectButton.getButton());
         this.rightFormPanel.getPanel().add(connectionLabel.getLabel());
@@ -83,11 +87,6 @@ public class RightPanel extends SimplePanel{
         }
     }
     private class DisconnectButtonListener implements ActionListener {
-        /**
-         * Invoked when an action occurs.
-         *
-         * @param e the event to be processed
-         */
         @Override
         public void actionPerformed(ActionEvent e) {
             if(connection.sendDisconnectRequest()){
@@ -110,10 +109,10 @@ public class RightPanel extends SimplePanel{
     private class LoginButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(connection.sendLoginRequest(usernameTextField.getText(), passwordField.getPassword())){
+            if(connection.sendLoginRequest(usernameTextField.getText(), getPassword())){
                 System.out.println("Logged in");
                 clientMainWindow.setUsername(usernameTextField.getText());
-                clientMainWindow.setPassword(passwordField.getPassword());
+                clientMainWindow.setPassword(getPassword());
                 disconnectButton.getButton().setEnabled(false);
                 loginButton.getButton().setEnabled(false);
                 logoutButton.getButton().setEnabled(true);
@@ -122,9 +121,10 @@ public class RightPanel extends SimplePanel{
                 loginStatusLabel.getLabel().setForeground(Color.green);
                 loginStatusLabel.getLabel().setText("Logged in");
                 usernameTextField.getTextField().setEditable(false);
-                passwordField.getPasswordField().setEditable(false);
+                passwordField.setEditable(false);
                 clientMainWindow.isConencted = true;
                 clientMainWindow.isLoggedIn = true;
+                clientMainWindow.leftPanel.setWatchlist();
             }else{
                 System.err.println("Could not login");
             }
@@ -144,10 +144,14 @@ public class RightPanel extends SimplePanel{
                 loginStatusLabel.getLabel().setText("Not Logged in");
                 loginStatusLabel.getLabel().setForeground(Color.red);
                 usernameTextField.getTextField().setEditable(true);
-                passwordField.getPasswordField().setEditable(true);
+                passwordField.setEditable(true);
                 clientMainWindow.isConencted = true;
                 clientMainWindow.isLoggedIn = false;
+                clientMainWindow.leftPanel.deleteOldUserData();
             }
         }
+    }
+    public String getPassword() {
+        return passwordField.getText();
     }
 }

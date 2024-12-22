@@ -49,6 +49,7 @@ public class CenterPanel extends SimplePanel implements Runnable{
             panel.add(f.getButton());
         }
         panel.revalidate();
+        panel.repaint();
     }
     @Override
     public void run() {

@@ -127,5 +127,6 @@ public class ServerConnection {
         currentRequest.update_watchlist(data);
         return responseHandler(currentRequest);
     }
+    //public b
 
 }
