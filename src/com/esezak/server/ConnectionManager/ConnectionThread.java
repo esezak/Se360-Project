@@ -71,6 +71,7 @@ public class ConnectionThread extends Thread {
             case RequestType.GET_MOVIE_INFORMATION -> handleGetMovieInformationRequest(request);
             case RequestType.UPDATE_WATCHLIST -> handleUpdateWatchlistRequest(request);
             case RequestType.DELETE_MOVIE_FROM_WATCHLIST -> handleDeleteMovieFromWatchlistRequest(request);
+            case RequestType.SIGNUP -> handleSignupRequest(request);
             default -> false;
         };
     }
@@ -134,6 +135,39 @@ public class ConnectionThread extends Thread {
         terminate = true;
         sendOkResponse();
         connection.close();
+        return true;
+    }
+
+    private boolean handleSignupRequest(Request request) throws IOException {
+        JSONObject requestData = new JSONObject(request.getData());
+        String username = requestData.getString("username");
+        String password = requestData.getString("password");
+        String query1 = "SELECT COUNT(*) FROM Users WHERE username = ?";
+        String query2 = "INSERT INTO Users (username, password) VALUES (?, ?)";
+        try {
+            if (dbConnection != null) {
+                try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query1)) {
+                    pstmt.setString(1, username);
+                    ResultSet rs = pstmt.executeQuery();
+                    if (rs.getInt(1) > 0) {
+                        System.err.println("Username already exists");
+                        sendErrorResponse();
+                        return false;
+                    }
+                }
+                try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query2)) {
+                    pstmt.setString(1, username);
+                    pstmt.setString(2, password);
+                    pstmt.executeUpdate();
+                    System.out.println("User signed up");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database Error: " + e.getMessage());
+            sendErrorResponse();
+            return false;
+        }
+        sendOkResponse();
         return true;
     }
 

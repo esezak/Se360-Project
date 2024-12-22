@@ -7,6 +7,7 @@ import java.sql.*;
 public class DBConnection {
     private Connection dbConnection;
     private String url = "jdbc:sqlite:mydb.db";
+
     public DBConnection() {
         try {
             dbConnection = DriverManager.getConnection(url);
@@ -16,9 +17,11 @@ public class DBConnection {
             e.printStackTrace();
         }
     }
+
     public Connection getDbConnection() {
         return dbConnection;
     }
+
     public void closeConnection() {
         try {
             if (dbConnection != null) {
@@ -29,11 +32,12 @@ public class DBConnection {
             e.printStackTrace();
         }
     }
+
     public void addToDatabase(Content content) {
         String query = "INSERT INTO Movies (movie_id, title, release_year, genre, director, overview, image_url, rating) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try{
+        try {
             if (dbConnection != null && !isDuplicate(content)) {
                 try (PreparedStatement statement = dbConnection.prepareStatement(query)) {
                     statement.setString(1, content.getId());
@@ -73,6 +77,7 @@ public class DBConnection {
             }
         }
     }
+
     public boolean verifyPassword(String username, String password) {
         String query = "SELECT password FROM Users WHERE username = ?";
         try (PreparedStatement pstmt = dbConnection.prepareStatement(query)) {
@@ -88,6 +93,7 @@ public class DBConnection {
         }
         return false;
     }
+
     public boolean isMovieInWatchlist(String username, String movieId) throws SQLException {
         String query = "SELECT 1 FROM Watchlist WHERE username = ? AND movie_id = ?";
         try (PreparedStatement pstmt = dbConnection.prepareStatement(query)) {
@@ -98,31 +104,4 @@ public class DBConnection {
             }
         }
     }
-//    public void setRating(String movieId){
-//        String query = "SELECT AVG(user_rating) AS average_rating FROM Reviews WHERE movie_id = ?";
-//        //String query2 = "UPDATE Movies SET rating = ? WHERE movie_id = ?";
-//        double averageRating = 0;
-//        try (PreparedStatement pstmt = dbConnection.prepareStatement(query)) {
-//            pstmt.setString(1, movieId);
-//            try (ResultSet rs = pstmt.executeQuery()) {
-//                if (rs.next()) {
-//                    averageRating = rs.getDouble("average_rating");
-//                }
-//            }
-//        } catch (SQLException e) {
-//            System.err.println("Database Error: " + e.getMessage());
-//        }
-//        try(PreparedStatement pstmt = dbConnection.prepareStatement(query2)){
-//            pstmt.setDouble(1, averageRating);
-//            pstmt.setString(2, movieId);
-//            try{
-//                ResultSet rs = pstmt.executeQuery();
-//            } catch (SQLException e) {
-//                throw new RuntimeException(e);
-//            }
-//            return averageRating;
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
 }
