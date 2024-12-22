@@ -71,6 +71,13 @@ public class Request implements Serializable {
         json.put("username", username);
         data = json.toString();
     }
+    public void sign_up(String username, String password){
+        json = new JSONObject();
+        requestType = RequestType.SIGNUP;
+        json.put("username", username);
+        json.put("password", password);
+        data = json.toString();
+    }
     public RequestType getRequestType() {
         return requestType;
     }
