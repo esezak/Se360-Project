@@ -79,7 +79,7 @@ public class RightPanel extends SimplePanel{
                 loginButton.getButton().setEnabled(true);
                 leftPanel.setFilmsButtonState(true);
                 topPanel.setSearchStatus(true);
-                clientMainWindow.isConencted = true;
+                clientMainWindow.isConnected = true;
 
             }else{
                 System.err.println("Could not connect to server");
@@ -99,7 +99,7 @@ public class RightPanel extends SimplePanel{
                 connectionStatusLabel.getLabel().setText("Disconnected");
                 topPanel.setSearchStatus(false);
                 leftPanel.setFilmsButtonState(false);
-                clientMainWindow.isConencted = false;
+                clientMainWindow.isConnected = false;
                 clientMainWindow.isLoggedIn = false;
             }else{
                 System.err.println("Could not disconnect from server");
@@ -122,7 +122,7 @@ public class RightPanel extends SimplePanel{
                 loginStatusLabel.getLabel().setText("Logged in");
                 usernameTextField.getTextField().setEditable(false);
                 passwordField.setEditable(false);
-                clientMainWindow.isConencted = true;
+                clientMainWindow.isConnected = true;
                 clientMainWindow.isLoggedIn = true;
                 clientMainWindow.leftPanel.setWatchlist();
             }else{
@@ -145,7 +145,7 @@ public class RightPanel extends SimplePanel{
                 loginStatusLabel.getLabel().setForeground(Color.red);
                 usernameTextField.getTextField().setEditable(true);
                 passwordField.setEditable(true);
-                clientMainWindow.isConencted = true;
+                clientMainWindow.isConnected = true;
                 clientMainWindow.isLoggedIn = false;
                 clientMainWindow.leftPanel.deleteOldUserData();
             }

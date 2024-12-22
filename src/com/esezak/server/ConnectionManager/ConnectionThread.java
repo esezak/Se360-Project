@@ -21,11 +21,9 @@ import java.util.ArrayList;
 
 
 public class ConnectionThread extends Thread {
-    private Socket connection;
+    private final Socket connection;
     private ObjectOutputStream sendChannel;
     private DBConnection dbConnection;
-    private ObjectInputStream receiveChannel;
-    private Request currentRequest;
     private Response currentResponse;
     private boolean loggedIn = false;
     private boolean terminate = false;
@@ -35,31 +33,32 @@ public class ConnectionThread extends Thread {
         this.connection = connection;
     }
 
-    //TODO make it handle different requests
     public void run() {
         try{
             sendChannel = new ObjectOutputStream(connection.getOutputStream());
-            receiveChannel = new ObjectInputStream(connection.getInputStream());
+            ObjectInputStream receiveChannel = new ObjectInputStream(connection.getInputStream());
             dbConnection = new DBConnection();
-            while (!terminate) {
-                currentRequest = (Request) receiveChannel.readObject();
-                handleRequest(currentRequest);
-                if(currentResponse.getStatus()){
+            while (!terminate) {//accept requests until disconnect
+                Request currentRequest = (Request) receiveChannel.readObject();
+                if(handleRequest(currentRequest)){
                     System.out.println("Request handled");
                 }else{
                     System.err.println("Request not handled");
                 }
             }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("IOException in ServerThread");
                 terminate = true;
             } catch (ClassNotFoundException e) {
-                System.err.println("Could not recieve request");
-                e.printStackTrace();
+                System.err.println("Could not receive request");
                 terminate = true;
             }
     }
 
+    /**
+     * @param request taken from client
+     * @return <code>true</code> if request is handled properly otherwise returns <code>false</code>
+     */
     private boolean handleRequest(Request request) throws IOException {
         return switch (request.getRequestType()) {
             case RequestType.LOGIN -> handleLoginRequest(request);
@@ -72,103 +71,15 @@ public class ConnectionThread extends Thread {
             case RequestType.GET_MOVIE_INFORMATION -> handleGetMovieInformationRequest(request);
             case RequestType.UPDATE_WATCHLIST -> handleUpdateWatchlistRequest(request);
             case RequestType.DELETE_MOVIE_FROM_WATCHLIST -> handleDeleteMovieFromWatchlistRequest(request);
-
             default -> false;
         };
     }
 
 
-    //TODO BORA
-    private boolean handleDeleteMovieFromWatchlistRequest(Request request) throws IOException {
-        JSONObject requestData = new JSONObject(request.getData());
-        String username = requestData.getString("username");
-        String movieId = requestData.getString("movie_id");
-        if (!checkAuth(username)) {
-            sendErrorResponse();
-            return false;
-        }
-        String query = "DELETE FROM Watchlist WHERE username = ? AND movie_id = ?";
-        try {
-            if (dbConnection != null) {
-                try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query)) {
-                    pstmt.setString(1, username);
-                    pstmt.setString(2, movieId);
-                    int rows = pstmt.executeUpdate();
-                    if (rows > 0) {
-                        sendOkResponse();
-                        System.out.println("Movie deleted from watchlist");
-                        setRating(movieId);
-                        return true;
-                    } else {
-                        System.err.println("Movie not found");
-                        sendErrorResponse();
-                        return false;
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Database Error: " + e.getMessage());
-            sendErrorResponse();
-            return false;
-        }
-        return false;
-    }
-
-    private boolean handleGetMovieInformationRequest(Request request) throws IOException {
-        JSONObject json = new JSONObject(request.getData());
-        String movieId = json.getString("movie_id");
-        String query = """
-        SELECT username, comment, user_rating, review_date
-        FROM Reviews
-        WHERE movie_id = ?
-    """;
-        ArrayList<Review> reviews = new ArrayList<>();
-        try {
-            if (dbConnection != null) {
-                try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query)) {
-                    pstmt.setString(1, movieId);
-                    try (ResultSet rs = pstmt.executeQuery();) {
-                        while (rs.next()) {
-                            String username = rs.getString("username");
-                            int rating = rs.getInt("user_rating");
-                            String comment = rs.getString("comment");
-                            System.out.println("Added: "+username + " " + rating + " " + comment);
-                            reviews.add(new Review(username, rating, comment));
-                        }
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Database Error: " + e.getMessage());
-            sendErrorResponse();
-            return false;
-        }
-        currentResponse = new Response(true,reviews,false);
-        sendResponse();
-        return true;
-    }
-
-    private boolean handleSearchMovieRequest(Request request) throws IOException {
-        JSONObject requestData = new JSONObject(request.getData());
-        String movieName = requestData.getString("movie_name");
-        try{
-            ArrayList<Content> movies = TVDBSearcher.queryFromTVDB(movieName);
-
-
-            //TODO aldığımız movies listesindeki movieleri dbde arayıp varsa oradaki ratingi göstermek.
-
-
-
-            currentResponse = new Response(true,movies);
-            sendChannel.writeObject(currentResponse);
-            return true;
-        } catch (IOException e) {
-            System.err.println("Could not search movie " + movieName);
-            sendErrorResponse();
-            return false;
-        }
-    }
-
+    /**
+     * @param request taken from client
+     * @return <code>true</code> if login is successful
+     */
     private boolean handleLoginRequest(Request request) throws IOException {
         JSONObject loginData = new JSONObject(request.getData());   // parses json data
         this.password = loginData.getString("password");     // password field
@@ -197,6 +108,9 @@ public class ConnectionThread extends Thread {
         }
     }
 
+    /**
+     * @return <code>true</code> if logout request is successful
+     */
     private boolean handleLogoutRequest() throws IOException {
         if (loggedIn) {
             loggedIn = false;
@@ -211,6 +125,10 @@ public class ConnectionThread extends Thread {
             return false;
         }
     }
+
+    /**
+     * @return <code>true</code> if disconnect request is successful
+     */
     private boolean handleDisconnectRequest() throws IOException {
         System.out.println("Client Disconnected");
         terminate = true;
@@ -220,10 +138,8 @@ public class ConnectionThread extends Thread {
     }
 
     /**
-     * @param request
-     * @return sets the current response status true if succesfull and adds Arraylist of movies in <br>
-     * Response.movies
-     * @throws IOException
+     * @param request taken from client
+     * @return checks if the user is logged in and creates a response that has the user watchlist as a <code>json</code>  and sets the current response status <code>true</code> if everything is successful
      */
     private boolean handleGetWatchlistRequest(Request request) throws IOException {
         JSONObject requestData = new JSONObject(request.getData());
@@ -267,58 +183,11 @@ public class ConnectionThread extends Thread {
         return true;
     }
 
-    private boolean handleUpdateWatchlistRequest(Request request) throws IOException {
-        JSONArray requestData = new JSONArray(request.getData());
-        String username = requestData.getJSONObject(0).getString("username");
-        if (!checkAuth(username)) {
-            sendErrorResponse();
-            return false;
-        }
-        String query = """
-        INSERT INTO Watchlist (username, movie_id, date_added, user_rating, status)
-        VALUES (?, ?, ?, ?, ?)
-        ON CONFLICT (username, movie_id)
-        DO UPDATE SET 
-            date_added = excluded.date_added, 
-            user_rating = excluded.user_rating, 
-            status = excluded.status
-    """;
-        try {
-            if (dbConnection != null) {
-                for (int i = 1; i < requestData.length(); i++) {
-                    JSONObject movieData = requestData.getJSONObject(i);
-                    String movieId = movieData.getString("movie_id");
-                    String dateAdded = movieData.getString("date_added");
-                    int userRating = movieData.getInt("user_rating");
-                    String status = movieData.getString("status");
-                    try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query)) {
-                        pstmt.setString(1, username);
-                        pstmt.setString(2, movieId);
-                        pstmt.setString(3, dateAdded);
-                        pstmt.setInt(4, userRating);
-                        pstmt.setString(5, status);
-                        pstmt.executeUpdate();
-                        setRating(movieId);
-                        System.out.println("Added: "+movieId+" rating: "+userRating+" status: "+status);
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Database Error: " + e.getMessage());
-            sendErrorResponse();
-            return false;
-        }
-        System.out.println("Updated watchlist");
-        sendOkResponse();
-        return true;
-    }
-
     /**
-     * checks if the user is logged in and if the movie request is already in the users watchlist. <br>
-     * if the user is logged in and the moive is not in the watchlist add the movie to user watchlist
-     * @param request
+     * checks if the user is logged in and if the movie request is already in the users watchlist.
+     * if the user is logged in and the movie is not in the watchlist add the movie to user watchlist
+     * @param request taken from client
      * @return true if the movie is added successfully
-     * @throws IOException
      */
     private boolean handleAddMovieToWatchlistRequest(Request request) throws IOException {
         JSONObject requestData = new JSONObject(request.getData());
@@ -352,11 +221,9 @@ public class ConnectionThread extends Thread {
         System.out.println("Movie added to watchlist");
         return true;
     }
-
     /**
-     * @param request
-     * @return true if rate movie request is successfully completed else false
-     * @throws IOException
+     * @param request taken from client
+     * @return <code>true</code> if rate movie request is successfully completed else false
      */
     private boolean handleRateMovieRequest(Request request) throws IOException {
         JSONObject reviewData = new JSONObject(request.getData());
@@ -379,11 +246,11 @@ public class ConnectionThread extends Thread {
         INSERT INTO Reviews (username, movie_id, comment, user_rating, review_date)
         VALUES (?, ?, ?, ?, datetime('now'))
         ON CONFLICT(username, movie_id)
-        DO UPDATE SET 
-            comment = excluded.comment, 
-            user_rating = excluded.user_rating, 
+        DO UPDATE SET\s
+            comment = excluded.comment,\s
+            user_rating = excluded.user_rating,\s
             review_date = excluded.review_date
-    """;
+   \s""";
         try {
             if (dbConnection != null) {
                 try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query)) {
@@ -404,6 +271,163 @@ public class ConnectionThread extends Thread {
         setRating(movieId);
         return true;
     }
+
+    /**
+     * @param request taken from client
+     * @return true if fetching movies is successful
+     */
+    private boolean handleSearchMovieRequest(Request request) throws IOException {
+        JSONObject requestData = new JSONObject(request.getData());
+        String movieName = requestData.getString("movie_name");
+        try{
+            ArrayList<Content> moviesFromTVDB = TVDBSearcher.queryFromTVDB(movieName);
+
+
+            //TODO aldığımız movies listesindeki movieleri dbde arayıp varsa oradaki ratingi göstermek.
+
+
+
+            currentResponse = new Response(true,moviesFromTVDB);
+            sendChannel.writeObject(currentResponse);
+            return true;
+        } catch (IOException e) {
+            System.err.println("Could not search movie " + movieName);
+            sendErrorResponse();
+            return false;
+        }
+    }
+
+    /**
+     * @param request taken from client
+     * @return <code>true</code> if getting reviews of movies from the db is successful
+     */
+    private boolean handleGetMovieInformationRequest(Request request) throws IOException {
+        JSONObject json = new JSONObject(request.getData());
+        String movieId = json.getString("movie_id");
+        String query = """
+        SELECT username, comment, user_rating, review_date
+        FROM Reviews
+        WHERE movie_id = ?
+    """;
+        ArrayList<Review> reviews = new ArrayList<>();
+        try {
+            if (dbConnection != null) {
+                try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query)) {
+                    pstmt.setString(1, movieId);
+                    try (ResultSet rs = pstmt.executeQuery();) {
+                        while (rs.next()) {
+                            String username = rs.getString("username");
+                            int rating = rs.getInt("user_rating");
+                            String comment = rs.getString("comment");
+                            System.out.println("Added: "+username + " " + rating + " " + comment);
+                            reviews.add(new Review(username, rating, comment));
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database Error: " + e.getMessage());
+            sendErrorResponse();
+            return false;
+        }
+        currentResponse = new Response(true,reviews,false);
+        sendResponse();
+        return true;
+    }
+
+    /**
+     * @param request taken from client
+     * @return <code>true</code> if watchlist rows taken from client is updated in the db successfully
+     */
+    private boolean handleUpdateWatchlistRequest(Request request) throws IOException {
+        JSONArray requestData = new JSONArray(request.getData());
+        String username = requestData.getJSONObject(0).getString("username");
+        if (!checkAuth(username)) {
+            sendErrorResponse();
+            return false;
+        }
+        String query = """
+        INSERT INTO Watchlist (username, movie_id, date_added, user_rating, status)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT (username, movie_id)
+        DO UPDATE SET\s
+            date_added = excluded.date_added,\s
+            user_rating = excluded.user_rating,\s
+            status = excluded.status
+   \s""";
+        try {
+            if (dbConnection != null) {
+                for (int i = 1; i < requestData.length(); i++) {
+                    JSONObject movieData = requestData.getJSONObject(i);
+                    String movieId = movieData.getString("movie_id");
+                    String dateAdded = movieData.getString("date_added");
+                    int userRating = movieData.getInt("user_rating");
+                    String status = movieData.getString("status");
+                    try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query)) {
+                        pstmt.setString(1, username);
+                        pstmt.setString(2, movieId);
+                        pstmt.setString(3, dateAdded);
+                        pstmt.setInt(4, userRating);
+                        pstmt.setString(5, status);
+                        pstmt.executeUpdate();
+                        setRating(movieId);
+                        System.out.println("Added: "+movieId+" rating: "+userRating+" status: "+status);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database Error: " + e.getMessage());
+            sendErrorResponse();
+            return false;
+        }
+        System.out.println("Updated watchlist");
+        sendOkResponse();
+        return true;
+    }
+
+    /**
+     * @param request taken from client
+     * @return <code>true</code> if <code>deleteMovie</code> is successful
+     */
+    private boolean handleDeleteMovieFromWatchlistRequest(Request request) throws IOException {
+        JSONObject requestData = new JSONObject(request.getData());
+        String username = requestData.getString("username");
+        String movieId = requestData.getString("movie_id");
+        if (!checkAuth(username)) {
+            sendErrorResponse();
+            return false;
+        }
+        String query = "DELETE FROM Watchlist WHERE username = ? AND movie_id = ?";
+        try {
+            if (dbConnection != null) {
+                try (PreparedStatement pstmt = dbConnection.getDbConnection().prepareStatement(query)) {
+                    pstmt.setString(1, username);
+                    pstmt.setString(2, movieId);
+                    int rows = pstmt.executeUpdate();
+                    if (rows > 0) {
+                        sendOkResponse();
+                        System.out.println("Movie deleted from watchlist");
+                        setRating(movieId);
+                        return true;
+                    } else {
+                        System.err.println("Movie not found");
+                        sendErrorResponse();
+                        return false;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database Error: " + e.getMessage());
+            sendErrorResponse();
+            return false;
+        }
+        return false;
+    }
+
+    /**
+     * @param movieId gets the moviId
+     * calculates the avg rating from the reviews from the database
+     */
     private void setRating(String movieId){
         String query = "SELECT AVG(user_rating) AS average_rating FROM Reviews WHERE movie_id = ?";
         String query2 = "UPDATE Movies SET rating = ? WHERE movie_id = ?";
@@ -430,8 +454,7 @@ public class ConnectionThread extends Thread {
 
 
     /**
-     * Sends ok response if everything is in order
-     * @throws IOException
+     * Used to send ok response if everything is in order
      */
     private void sendOkResponse() throws IOException {
         System.out.println("Sent ok response");
@@ -440,7 +463,7 @@ public class ConnectionThread extends Thread {
     }
 
     /**
-     * Sends error response if something is not right
+     * Used to send error response if something is not right
      * @throws IOException
      */
     private void sendErrorResponse() throws IOException {
@@ -450,8 +473,8 @@ public class ConnectionThread extends Thread {
     }
 
     /**
-     * @throws IOException Sends the current response directly
-     * this is for sending prepared responses. <br>
+     * Sends the current response directly
+     * this is for sending prepared responses.
      * should not be used with error/ok responses.
      */
     private void sendResponse() throws IOException {
@@ -460,7 +483,7 @@ public class ConnectionThread extends Thread {
     }
 
     /**
-     * @param username
+     * @param username of the logged-in user
      * @return false if logged-in username == request maker username and user is logged in else true
      * @throws IOException
      */

@@ -53,12 +53,11 @@ public class CenterPanel extends SimplePanel implements Runnable{
     }
     @Override
     public void run() {
-        FilmButton asd = new FilmButton(toBeAdded,this);
-        buttons.add(asd);
-        panel.add(asd.getButton());
+        FilmButton filmButton = new FilmButton(toBeAdded,this);
+        buttons.add(filmButton);
+        panel.add(filmButton.getButton());
         panel.revalidate();
         panel.repaint();
-        //System.out.println("Process finished");
     }
     public void setFilms(ArrayList<Content> films){
         this.films = films;

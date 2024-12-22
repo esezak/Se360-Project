@@ -13,11 +13,10 @@ public class ClientMainWindow {
     public LeftPanel leftPanel;
     public RightPanel rightPanel;
     public CenterPanel centerPanel;
-    public BottomPanel bottomPanel;
     public static final Font GLOBAL_FONT = new Font("Arial", Font.BOLD, 16);
     public static final Border GLOBAL_BORDER = BorderFactory.createEmptyBorder(5,5,5,5);
     public ServerConnection connection;
-    public boolean isConencted = false;
+    public boolean isConnected = false;
     public boolean isLoggedIn = false;
     private String username;
     private String password;
@@ -26,6 +25,10 @@ public class ClientMainWindow {
     public ClientMainWindow() {
         initialize();
     }
+
+    /**
+     * initializes elements
+     */
     private void initialize() {
         connection = new ServerConnection("localhost",12345);
         setFrame();
@@ -36,6 +39,10 @@ public class ClientMainWindow {
         setBottomPanel();
 
     }
+
+    /**
+     * Sets up the frame
+     */
     private void setFrame(){
         frame = new JFrame();
         frame.setSize(1280, 720);
@@ -66,8 +73,7 @@ public class ClientMainWindow {
     }
 
     private void setBottomPanel(){
-        bottomPanel = new BottomPanel();
-        frame.getContentPane().add(bottomPanel.getPanel(), BorderLayout.SOUTH);
+        frame.getContentPane().add(new BottomPanel().getPanel(), BorderLayout.SOUTH);
     }
 
     public String getUsername() {
@@ -85,12 +91,6 @@ public class ClientMainWindow {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    public static class Launcher {
-        public static void main(String[] args) {
-            SwingUtilities.invokeLater(() -> {ClientMainWindow main = new ClientMainWindow();});
-        }
-    }
     private static class BottomPanel extends SimplePanel {
         public BottomPanel() {
             super();
@@ -98,6 +98,11 @@ public class ClientMainWindow {
             SimpleLabel label = new SimpleLabel("Powered By: TVDB.com");
             label.getLabel().setForeground(Color.BLUE);
             getPanel().add(label.getLabel());
+        }
+    }
+    public static class Launcher {
+        public static void main(String[] args) {
+            SwingUtilities.invokeLater(() -> {ClientMainWindow main = new ClientMainWindow();});
         }
     }
 }
