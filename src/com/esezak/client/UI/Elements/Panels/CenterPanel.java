@@ -57,6 +57,7 @@ public class CenterPanel extends SimplePanel implements Runnable{
         buttons.add(asd);
         panel.add(asd.getButton());
         panel.revalidate();
+        panel.repaint();
         //System.out.println("Process finished");
     }
     public void setFilms(ArrayList<Content> films){

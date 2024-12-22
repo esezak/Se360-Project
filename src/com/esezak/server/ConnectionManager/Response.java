@@ -70,25 +70,6 @@ public class Response implements Serializable {
         this.data = jsonArray.toString();
         System.out.println(data);
     }
-
-    public void tempReturnWatchlist(ArrayList<Content> movies) {//Should be converted to string
-        JSONObject row = null;
-        JSONArray movieArray = new JSONArray();
-        for (Content movie : movies) {
-            row = new JSONObject();
-            row.put("movie_id", movie.getId());
-            row.put("title", movie.getTitle());
-            //---------------------------------Replace with info from db//TODO
-            row.put("date_added", LocalDateTime.now().toString());
-            row.put("rating", 5);
-            row.put("status","watched");
-            //------------------------------------------------
-            movieArray.put(row);
-            System.out.println("Row added: " + row.toString());
-        }
-        System.out.println("final array: " + movieArray.toString());
-        this.data = movieArray.toString();
-    }
     public JSONArray getWatchlist() {
         return new JSONArray(data);
     }

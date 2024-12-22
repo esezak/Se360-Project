@@ -66,14 +66,15 @@ public class Request implements Serializable {
         data = movie_data;
     }
     public void delete_from_watchlist(String movie_id, String username){
+        requestType = RequestType.DELETE_MOVIE_FROM_WATCHLIST;
         json = new JSONObject();
         json.put("movie_id", movie_id);
         json.put("username", username);
         data = json.toString();
     }
     public void sign_up(String username, String password){
-        json = new JSONObject();
         requestType = RequestType.SIGNUP;
+        json = new JSONObject();
         json.put("username", username);
         json.put("password", password);
         data = json.toString();

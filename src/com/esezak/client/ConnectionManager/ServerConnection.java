@@ -127,6 +127,16 @@ public class ServerConnection {
         currentRequest.update_watchlist(data);
         return responseHandler(currentRequest);
     }
+    public boolean sendDeleteFromWatchListRequest(String movie_id, String username){
+        currentRequest = new Request();
+        currentRequest.delete_from_watchlist(movie_id,username);
+        return responseHandler(currentRequest);
+    }
+    public boolean sendSignupRequest(String username, String password){
+        currentRequest = new Request();
+        currentRequest.sign_up(username,password);
+        return responseHandler(currentRequest);
+    }
     //public b
 
 }

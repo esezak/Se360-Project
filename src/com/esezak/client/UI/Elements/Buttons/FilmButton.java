@@ -70,6 +70,7 @@ public class FilmButton extends SimpleButton {
             filmPanel.setReviewButtonStates();
             centerPanel.getPanel().add(filmPanel.getPanel());
             centerPanel.getPanel().revalidate();
+            centerPanel.getPanel().repaint();
         }
     }
 }

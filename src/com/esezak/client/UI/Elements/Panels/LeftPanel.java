@@ -70,14 +70,11 @@ public class LeftPanel extends SimplePanel{
         @Override
         public void actionPerformed(ActionEvent e) {
             centerPanel.getPanel().removeAll();
-            if(watchlist == null){
-                setWatchlist();
-            }
-            if(watchlistPanel == null){
-                watchlistPanel =  new WatchlistPanel(watchlist,clientMainWindow);
-            }
+            setWatchlist();
+            watchlistPanel = new WatchlistPanel(watchlist,clientMainWindow);
             centerPanel.getPanel().add(watchlistPanel.getPanel());
             centerPanel.getPanel().revalidate();
+            centerPanel.getPanel().repaint();
         }
     }
 

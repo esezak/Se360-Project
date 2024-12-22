@@ -27,7 +27,7 @@ public class FilmPanel extends SimplePanel {
     private JComboBox<Integer> ratingsComboBox;
     private SimplePanel buttonsPanel;
     public SimpleButton commentButton;
-    public SimpleButton addToWatchListButton;
+    public SimpleButton addRemoveFromWatchListButton;
     ClientMainWindow clientMainWindow;
     int userRating;
     private Review review;
@@ -46,7 +46,7 @@ public class FilmPanel extends SimplePanel {
 
         this.film = film;
         this.icon = icon;
-        movieFound = clientMainWindow.leftPanel.isMovieInWatchlist(film.getId());
+
 
         infoString = "<html><body><div><h2>"+film.getTitle()+"</h2>"+
                 "<p style=\"font-size:11px\">Genres: "+film.getGenres()+"</p>"+
@@ -58,92 +58,65 @@ public class FilmPanel extends SimplePanel {
         scrollPane.createVerticalScrollBar();
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
 
-        //---------------------Movie Banner-------------------------
         filmDetailsPanel = new SimplePanel();
-//        SimpleLabel movieBanner = new SimpleLabel(icon,infoString);//Movie details
-//        movieBanner.getLabel().setIconTextGap(10);
-//        filmDetailsPanel.getPanel().add(movieBanner.getLabel(),BorderLayout.NORTH);
-//        panel.add(filmDetailsPanel.getPanel(),BorderLayout.NORTH);
-        //--------------------------------------------------
 
-        //-------------------Before Review Buttons + Write Review---------------------
+
         userInputHolderPanel = new SimplePanel();
-            //------------Write Comment Section----------------
+
         commentButton = new SimpleButton("Write a comment");
         commentButton.getButton().setBorder(BorderFactory.createLineBorder(Color.black));
 
 
             //--------------Add to watchlist button--------------
-        addToWatchListButton = new SimpleButton("Add to watch list");
-        addToWatchListButton.getButton().setIcon(addIcon);
-        addToWatchListButton.getButton().setBorder(BorderFactory.createLineBorder(Color.black));
-        addToWatchListButton.getButton().setEnabled(clientMainWindow.isLoggedIn);
-        addToWatchListButton.getButton().addActionListener(new onAddToWatchListButtonClick());
+        addRemoveFromWatchListButton = new SimpleButton("");
+        addRemoveFromWatchListButton.getButton().setBorder(BorderFactory.createLineBorder(Color.black));
+        addRemoveFromWatchListButton.getButton().setEnabled(clientMainWindow.isLoggedIn);
+        addRemoveFromWatchListButton.getButton().addActionListener(new addOrRemoveFromWatchList());
         buttonsPanel = new SimplePanel();
         buttonsPanel.getPanel().setLayout(new GridLayout(1,2));
-//        buttonsPanel.getPanel().add(commentButton.getButton());
-//        buttonsPanel.getPanel().add(addToWatchListButton.getButton());
-//        userInputHolderPanel.getPanel().add(buttonsPanel.getPanel(),BorderLayout.NORTH);
-
-//        panel.add(userInputHolderPanel.getPanel(),BorderLayout.CENTER);
         reviewsPanel = new SimplePanel();
         reviewsPanel.getPanel().setLayout(new GridLayout(0,1));
         commentButton.getButton().addActionListener(new onReviewButtonClick());
-        setReviewButtonStates();
-//        Response response = clientMainWindow.connection.getFilmInformation(film.getId());
-//        System.out.println(response.getData());
-//        ArrayList<Review> reviews = response.getReviews();
-//        for(int i = 0; i < reviews.size(); i++){
-//            addReview(reviews.get(i));
-//        }
-//        panel.add(reviewsPanel.getPanel(),BorderLayout.SOUTH);
         initialize();
-
     }
     public void initialize(){
         SimpleLabel movieBanner = new SimpleLabel(icon,infoString);//Movie details
         movieBanner.getLabel().setIconTextGap(10);
         filmDetailsPanel.getPanel().add(movieBanner.getLabel(),BorderLayout.NORTH);
-
         panel.add(filmDetailsPanel.getPanel(),BorderLayout.NORTH);
         buttonsPanel.getPanel().add(commentButton.getButton());
-        buttonsPanel.getPanel().add(addToWatchListButton.getButton());
+        buttonsPanel.getPanel().add(addRemoveFromWatchListButton.getButton());
         userInputHolderPanel.getPanel().add(buttonsPanel.getPanel(),BorderLayout.NORTH);
         panel.add(userInputHolderPanel.getPanel(),BorderLayout.CENTER);
         movieFound = clientMainWindow.leftPanel.isMovieInWatchlist(film.getId());
         System.out.println("current movie found: "+movieFound);
-        reviewsPanel.getPanel().removeAll();
-        Response response = clientMainWindow.connection.getFilmInformation(film.getId());
-        System.out.println(response.getData());
-        ArrayList<Review> reviews = response.getReviews();
-        for(int i = 0; i < reviews.size(); i++){
-            addReview(reviews.get(i));
-        }
-        panel.add(reviewsPanel.getPanel(),BorderLayout.SOUTH);
+        updateReviews();
         setReviewButtonStates();
         panel.revalidate();
-        clientMainWindow.centerPanel.getPanel().repaint();
+        panel.repaint();
     }
     public void setReviewButtonStates(){
-        if(!clientMainWindow.isLoggedIn){
+        if(!clientMainWindow.isLoggedIn){//not logged in
             commentButton.getButton().setEnabled(false);
+            addRemoveFromWatchListButton.getButton().setEnabled(false);
             commentButton.getButton().setToolTipText("You are not logged in");
-        }else if(!movieFound){
+            addRemoveFromWatchListButton.getButton().setToolTipText("You are not logged in");
+            addRemoveFromWatchListButton.getButton().setText("Add to watch list");
+            addRemoveFromWatchListButton.getButton().setIcon(addIcon);
+        }else if(!movieFound){// movie not in watchlist
             commentButton.getButton().setEnabled(false);
             commentButton.getButton().setToolTipText("You must add to watchlist to write a comment");
-        }else{
+            addRemoveFromWatchListButton.getButton().setEnabled(true);
+            addRemoveFromWatchListButton.getButton().setText("Add to watch list");
+            addRemoveFromWatchListButton.getButton().setIcon(addIcon);
+            addRemoveFromWatchListButton.getButton().setToolTipText(null);
+        }else{// movie in watchlist
             commentButton.getButton().setEnabled(true);
             commentButton.getButton().setToolTipText(null);
-        }
-
-        if(!clientMainWindow.isLoggedIn){
-            addToWatchListButton.getButton().setEnabled(false);
-            addToWatchListButton.getButton().setToolTipText("You are not logged in");
-        }else if(!movieFound){
-            addToWatchListButton.getButton().setEnabled(true);
-        }else{
-            addToWatchListButton.getButton().setText("Remove from Watchlist");
-            addToWatchListButton.getButton().setEnabled(true);
+            addRemoveFromWatchListButton.getButton().setText("Remove from Watchlist");
+            addRemoveFromWatchListButton.getButton().setIcon(deleteIcon);
+            addRemoveFromWatchListButton.getButton().setEnabled(true);
+            addRemoveFromWatchListButton.getButton().setToolTipText(null);
         }
     }
     private void addReview(Review review) {
@@ -163,6 +136,16 @@ public class FilmPanel extends SimplePanel {
             formatted.append(words[i]).append(" ");
         }
         return formatted.toString();
+    }
+    public void updateReviews(){
+        reviewsPanel.getPanel().removeAll();
+        Response response = clientMainWindow.connection.getFilmInformation(film.getId());
+        System.out.println(response.getData());
+        ArrayList<Review> reviews = response.getReviews();
+        for(int i = 0; i < reviews.size(); i++){
+            addReview(reviews.get(i));
+        }
+        panel.add(reviewsPanel.getPanel(),BorderLayout.SOUTH);
     }
     private class CommentHolderPanel {
         private SimplePanel reviewPanel;
@@ -187,28 +170,55 @@ public class FilmPanel extends SimplePanel {
         public JPanel getPanel(){
             return reviewPanel.getPanel();
         }
-
     }
     private class onReviewButtonClick implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            commentHolderPanel = new CommentHolderPanel();
-            userInputHolderPanel.getPanel().add(commentHolderPanel.getPanel(),BorderLayout.CENTER);
-            clientMainWindow.centerPanel.getPanel().revalidate();
+            if(commentHolderPanel != null){
+                commentHolderPanel.getPanel().removeAll();
+                userInputHolderPanel.getPanel().remove(commentHolderPanel.getPanel());
+                initialize();
+                userInputHolderPanel.getPanel().revalidate();
+                userInputHolderPanel.getPanel().repaint();
+                commentHolderPanel = null;
+                addRemoveFromWatchListButton.getButton().setEnabled(true);
+                addRemoveFromWatchListButton.getButton().setToolTipText(null);
+                clientMainWindow.centerPanel.getPanel().revalidate();
+                clientMainWindow.centerPanel.getPanel().repaint();
+            }else{
+                commentHolderPanel = new CommentHolderPanel();
+                userInputHolderPanel.getPanel().add(commentHolderPanel.getPanel(),BorderLayout.CENTER);
+                addRemoveFromWatchListButton.getButton().setEnabled(false);
+                addRemoveFromWatchListButton.getButton().setToolTipText("You must stop writing a comment to remove from Watchlist");
+                clientMainWindow.centerPanel.getPanel().revalidate();
+                clientMainWindow.centerPanel.getPanel().repaint();
+            }
         }
     }
-    private class onAddToWatchListButtonClick implements ActionListener {
+    private class addOrRemoveFromWatchList implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(addToWatchListButton.getButton().getText().equals("Remove from Watchlist")){
-                System.out.println("Remove from Watchlist not implemented");
-                addToWatchListButton.getButton().setText("Add to watch list");
-                addToWatchListButton.getButton().setIcon(addIcon);
+            if(addRemoveFromWatchListButton.getButton().getText().equals("Remove from Watchlist")){
+                if (clientMainWindow.connection.sendDeleteFromWatchListRequest(film.getId(),clientMainWindow.getUsername())) {
+                    System.out.println("Succesfully removed from watchlist");
+                    addRemoveFromWatchListButton.getButton().setText("Add to watch list");
+                    addRemoveFromWatchListButton.getButton().setIcon(addIcon);
+                    movieFound = false;
+                    setReviewButtonStates();
+                    clientMainWindow.centerPanel.getPanel().revalidate();
+                    clientMainWindow.centerPanel.getPanel().repaint();
+                }else{
+                    System.out.println("Failed to remove from watchlist");
+                }
             }else{
                 if (clientMainWindow.connection.sendAddToWatchListRequest(film.getId(), clientMainWindow.getUsername())) {
                     System.out.println("Added to watch list");
-                    addToWatchListButton.getButton().setText("Remove from Watchlist");
-                    addToWatchListButton.getButton().setIcon(deleteIcon);
+                    addRemoveFromWatchListButton.getButton().setText("Remove from Watchlist");
+                    addRemoveFromWatchListButton.getButton().setIcon(deleteIcon);
+                    movieFound = true;
+                    setReviewButtonStates();
+                    clientMainWindow.centerPanel.getPanel().revalidate();
+                    clientMainWindow.centerPanel.getPanel().repaint();
                 }else{
                     System.out.println("Failed to add to watch list");
                 }
@@ -223,11 +233,13 @@ public class FilmPanel extends SimplePanel {
             clientMainWindow.connection.sendRateMovieRequest(film.getId(),review);
             commentHolderPanel.getPanel().removeAll();
             userInputHolderPanel.getPanel().remove(commentHolderPanel.getPanel());
-            initialize();
+//            initialize();
+            updateReviews();
             userInputHolderPanel.getPanel().revalidate();
             userInputHolderPanel.getPanel().repaint();
 
         }
+
         public Review getReview() {
             String comment = commentHolderPanel.reviewTextArea.getText();
             int rating = ratingsComboBox.getSelectedIndex();

@@ -299,6 +299,7 @@ public class ConnectionThread extends Thread {
                         pstmt.setString(5, status);
                         pstmt.executeUpdate();
                         setRating(movieId);
+                        System.out.println("Added: "+movieId+" rating: "+userRating+" status: "+status);
                     }
                 }
             }

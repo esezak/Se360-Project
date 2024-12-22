@@ -56,6 +56,7 @@ public class DB_Init {
             );
         """;
                 String createTriggerWatchlistOnReview1 = """
+                DROP TRIGGER IF EXISTS UpdateWatchlistOnReviewChange1;
                 CREATE TRIGGER IF NOT EXISTS UpdateWatchlistOnReviewChange1
                 AFTER INSERT ON Reviews
                 FOR EACH ROW
@@ -66,6 +67,7 @@ public class DB_Init {
                 END;
             """;
                 String createTriggerWatchlistOnReview2 = """
+                DROP TRIGGER IF EXISTS UpdateWatchlistOnReviewChange2;
                 CREATE TRIGGER IF NOT EXISTS UpdateWatchlistOnReviewChange2
                 AFTER UPDATE ON Reviews
                 FOR EACH ROW
@@ -75,24 +77,25 @@ public class DB_Init {
                     WHERE username = NEW.username AND movie_id = NEW.movie_id;
                 END;
             """;
-                String createTriggerReviewOnWatchlist1 = """
-                CREATE TRIGGER IF NOT EXISTS UpdateReviewOnWatchlistChange1
-                AFTER INSERT ON Watchlist
-                FOR EACH ROW
-                BEGIN
-                    INSERT INTO Reviews (username, movie_id, user_rating, review_date, comment)
-                    VALUES (NEW.username, NEW.movie_id, NEW.user_rating, DATE('now'), 'From Watchlist')
-                    ON CONFLICT (username, movie_id)
-                    DO UPDATE SET user_rating = NEW.user_rating;
-                END;
-            """;
+//                String createTriggerReviewOnWatchlist1 = """
+//                CREATE TRIGGER IF NOT EXISTS UpdateReviewOnWatchlistChange1
+//                AFTER INSERT ON Watchlist
+//                FOR EACH ROW
+//                BEGIN
+//                    INSERT INTO Reviews (username, movie_id, user_rating, review_date, comment)
+//                    VALUES (NEW.username, NEW.movie_id, NEW.user_rating, DATE('now'), 'From Watchlist')
+//                    ON CONFLICT (username, movie_id)
+//                    DO UPDATE SET user_rating = NEW.user_rating;
+//                END; DROP TRIGGER UpdateReviewOnWatchlistChange1;
+//            """;
                 String createTriggerReviewOnWatchlist2 = """
+                DROP TRIGGER IF EXISTS UpdateReviewOnWatchlistChange2;
                 CREATE TRIGGER IF NOT EXISTS UpdateReviewOnWatchlistChange2
                 AFTER UPDATE ON Watchlist
                 FOR EACH ROW
                 BEGIN
                     INSERT INTO Reviews (username, movie_id, user_rating, review_date, comment)
-                    VALUES (NEW.username, NEW.movie_id, NEW.user_rating, DATE('now'), 'From Watchlist')
+                    VALUES (NEW.username, NEW.movie_id, NEW.user_rating, DATE('now'), 'Not Commented')
                     ON CONFLICT (username, movie_id)
                     DO UPDATE SET user_rating = NEW.user_rating;
                 END;
@@ -103,7 +106,7 @@ public class DB_Init {
                 statement.executeUpdate(createWatchlistTable);
                 statement.executeUpdate(createTriggerWatchlistOnReview1);
                 statement.executeUpdate(createTriggerWatchlistOnReview2);
-                statement.executeUpdate(createTriggerReviewOnWatchlist1);
+                //statement.executeUpdate(createTriggerReviewOnWatchlist1);
                 statement.executeUpdate(createTriggerReviewOnWatchlist2);
             } catch (SQLException e) {
                 e.printStackTrace();
