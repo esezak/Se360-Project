@@ -1,6 +1,7 @@
-package project.client.ConnectionManager;
-import project.server.Response;
-import project.server.Review;
+package project.client;
+import project.common.Request;
+import project.common.Response;
+import project.common.Review;
 
 import java.io.*;
 import java.net.*;

@@ -1,5 +1,7 @@
 package project.server;
 
+import project.common.Movie;
+
 import java.sql.*;
 
 public class DBConnection {

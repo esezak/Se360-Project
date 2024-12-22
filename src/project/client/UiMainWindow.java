@@ -1,6 +1,5 @@
 package project.client;
 
-import project.client.ConnectionManager.ServerConnection;
 import com.client.UI.Elements.Panels.*;
 import project.client.UI.Elements.Panels.*;
 import project.client.UI.Elements.SimpleLabel;

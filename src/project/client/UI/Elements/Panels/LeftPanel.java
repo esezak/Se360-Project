@@ -2,7 +2,7 @@ package project.client.UI.Elements.Panels;
 
 import project.client.UiMainWindow;
 import project.client.UI.Elements.SimpleButton;
-import project.server.Response;
+import project.common.Response;
 import org.json.JSONArray;
 
 import java.awt.*;

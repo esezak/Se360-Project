@@ -2,7 +2,7 @@ package project.client.UI.Elements;
 
 import project.client.UI.Elements.Panels.CenterPanel;
 import project.client.UI.Elements.Panels.FilmPanel;
-import project.server.Movie;
+import project.common.Movie;
 
 import javax.swing.*;
 import java.awt.*;

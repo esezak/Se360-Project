@@ -2,7 +2,7 @@ package project.client.UI.Elements.Panels;
 
 import project.client.UiMainWindow;
 import project.client.UI.Elements.FilmButton;
-import project.server.Movie;
+import project.common.Movie;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,4 +1,4 @@
-package project.client.ConnectionManager;
+package project.common;
 
 public enum RequestType {
     //Requests

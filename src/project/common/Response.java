@@ -1,4 +1,4 @@
-package project.server;
+package project.common;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

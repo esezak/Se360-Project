@@ -3,9 +3,9 @@ package project.client.UI.Elements.Panels;
 import project.client.UiMainWindow;
 import project.client.UI.Elements.SimpleButton;
 import project.client.UI.Elements.SimpleLabel;
-import project.server.Response;
-import project.server.Movie;
-import project.server.Review;
+import project.common.Response;
+import project.common.Movie;
+import project.common.Review;
 
 import javax.swing.*;
 import java.awt.*;

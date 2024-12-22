@@ -1,6 +1,5 @@
-package project.client.ConnectionManager;
+package project.common;
 
-import project.server.Review;
 import org.json.JSONObject;
 
 import java.io.Serializable;

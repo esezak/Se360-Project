@@ -1,9 +1,12 @@
 package project.server;
 
-import project.client.ConnectionManager.Request;
-import project.client.ConnectionManager.RequestType;
+import project.common.Request;
+import project.common.RequestType;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import project.common.Movie;
+import project.common.Response;
+import project.common.Review;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

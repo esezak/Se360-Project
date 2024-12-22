@@ -5,6 +5,8 @@ import org.apache.http.impl.client.*;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import project.common.Movie;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
