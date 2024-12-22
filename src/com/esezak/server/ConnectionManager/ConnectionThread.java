@@ -315,12 +315,9 @@ public class ConnectionThread extends Thread {
         String movieName = requestData.getString("movie_name");
         try{
             ArrayList<Content> moviesFromTVDB = TVDBSearcher.queryFromTVDB(movieName);
-
-
-            //TODO aldığımız movies listesindeki movieleri dbde arayıp varsa oradaki ratingi göstermek.
-
-
-
+            for(Content movie : moviesFromTVDB){
+                movie.setAvg_rating(dbConnection.getMovieRating(movie.getId()));
+            }
             currentResponse = new Response(true,moviesFromTVDB);
             sendChannel.writeObject(currentResponse);
             return true;

@@ -77,6 +77,21 @@ public class DBConnection {
             }
         }
     }
+    public Double getMovieRating(String movie_id){
+        String query = "SELECT rating FROM Movies WHERE movie_id = ?";
+        try (PreparedStatement pstmt = dbConnection.prepareStatement(query)) {
+            pstmt.setString(1, movie_id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("rating");
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return -1.0;
+    }
 
     public boolean verifyPassword(String username, String password) {
         String query = "SELECT password FROM Users WHERE username = ?";
