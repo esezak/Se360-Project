@@ -100,6 +100,17 @@ public class DB_Init {
                     DO UPDATE SET user_rating = NEW.user_rating;
                 END;
             """;
+                String createTriggerDeleteFromReviews = """
+                DROP TRIGGER IF EXISTS DeleteFromReviews;
+                CREATE TRIGGER IF NOT EXISTS DeleteFromReviews
+                AFTER DELETE ON Watchlist
+                FOR EACH ROW
+                BEGIN
+                    DELETE FROM Reviews
+                    WHERE movie_id = OLD.movie_id AND username = OLD.username;
+                END;
+            """;
+
                 statement.executeUpdate(createUsersTable);
                 statement.executeUpdate(createMoviesTable);
                 statement.executeUpdate(createReviewsTable);
@@ -108,6 +119,7 @@ public class DB_Init {
                 statement.executeUpdate(createTriggerWatchlistOnReview2);
                 //statement.executeUpdate(createTriggerReviewOnWatchlist1);
                 statement.executeUpdate(createTriggerReviewOnWatchlist2);
+                statement.executeUpdate(createTriggerDeleteFromReviews);
             } catch (SQLException e) {
                 e.printStackTrace();
             } finally {
