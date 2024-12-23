@@ -33,8 +33,8 @@ public class FilmPanel extends SimplePanel {
     private Review review;
     private boolean movieFound;
     private ImageIcon icon;
-    private ImageIcon addIcon = new ImageIcon("src/com/esezak/client/UI/Elements/Icons/add.png");
-    private ImageIcon deleteIcon = new ImageIcon("src/com/esezak/client/UI/Elements/Icons/delete.png");
+    private ImageIcon addIcon = new ImageIcon("src/project/client/UI/Elements/Icons/add.png");
+    private ImageIcon deleteIcon = new ImageIcon("src/project/client/UI/Elements/Icons/delete.png");
 
     public FilmPanel(Movie film, ImageIcon icon, UiMainWindow uiMainWindow) {
         super();
@@ -76,6 +76,7 @@ public class FilmPanel extends SimplePanel {
         buttonsPanel.getPanel().setLayout(new GridLayout(1,2));
         reviewsPanel = new SimplePanel();
         reviewsPanel.getPanel().setLayout(new GridLayout(0,1));
+        addRemoveFromWatchListButton.getButton().setIcon(addIcon);
         commentButton.getButton().addActionListener(new onReviewButtonClick());
         initialize();
     }
