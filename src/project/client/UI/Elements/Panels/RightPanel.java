@@ -67,6 +67,7 @@ public class RightPanel extends SimplePanel{
         panel.add(rightFormPanel.getPanel());
         SimplePanel signupButtonHolderPanel = new SimplePanel();
         signUpButton.getButton().addActionListener(new SignUpButtonListener());
+        signUpButton.getButton().setEnabled(false);
         signupButtonHolderPanel.getPanel().setLayout(new GridLayout(6,1));
         signupButtonHolderPanel.getPanel().add(signUpButton.getButton());
         panel.add(signupButtonHolderPanel.getPanel());
@@ -79,6 +80,7 @@ public class RightPanel extends SimplePanel{
                 connectionStatusLabel.getLabel().setForeground(Color.GREEN);
                 connectionStatusLabel.getLabel().setText("Connected");
                 connectButton.getButton().setEnabled(false);
+                signUpButton.getButton().setEnabled(true);
                 logoutButton.getButton().setEnabled(false);
                 disconnectButton.getButton().setEnabled(true);
                 loginButton.getButton().setEnabled(true);
@@ -100,6 +102,7 @@ public class RightPanel extends SimplePanel{
                 disconnectButton.getButton().setEnabled(false);
                 loginButton.getButton().setEnabled(false);
                 logoutButton.getButton().setEnabled(false);
+                signUpButton.getButton().setEnabled(false);
                 connectionStatusLabel.getLabel().setForeground(Color.red);
                 connectionStatusLabel.getLabel().setText("Disconnected");
                 topPanel.setSearchStatus(false);
