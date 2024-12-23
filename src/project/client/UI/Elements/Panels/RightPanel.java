@@ -14,7 +14,6 @@ import java.awt.event.ActionListener;
 import static project.client.UiMainWindow.GLOBAL_FONT;
 
 public class RightPanel extends SimplePanel{
-    private SimplePanel rightFormPanel;
     private SimpleLabel usernameLabel = new SimpleLabel("Username:");
     private SimpleLabel passwordLabel = new SimpleLabel("Password:");
     private SimpleLabel connectionLabel = new SimpleLabel("Server:");
@@ -27,13 +26,14 @@ public class RightPanel extends SimplePanel{
     public SimpleButton disconnectButton = new SimpleButton("Disconnect");
     public SimpleButton loginButton = new SimpleButton("Login");
     public SimpleButton logoutButton = new SimpleButton("Logout");
+    public SimpleButton signUpButton = new SimpleButton("Sign up");
     private TopPanel topPanel;
     private LeftPanel leftPanel;
     private ServerConnection connection;
     private UiMainWindow uiMainWindow;
     public RightPanel(UiMainWindow uiMainWindow){
         super();
-        rightFormPanel = new SimplePanel();
+        SimplePanel rightFormPanel = new SimplePanel();
         panel.setLayout(new GridLayout(3,1));
         passwordField = new JPasswordField();
         passwordField.setFont(GLOBAL_FONT);
@@ -41,20 +41,20 @@ public class RightPanel extends SimplePanel{
         this.topPanel = uiMainWindow.topPanel;
         this.leftPanel = uiMainWindow.leftPanel;
         this.uiMainWindow = uiMainWindow;
-        this.rightFormPanel.getPanel().setPreferredSize(new Dimension(250, 10));
-        this.rightFormPanel.getPanel().setLayout(new GridLayout(6,2,5,5));
-        this.rightFormPanel.getPanel().add(usernameLabel.getLabel());
-        this.rightFormPanel.getPanel().add(usernameTextField.getTextField());
-        this.rightFormPanel.getPanel().add(passwordLabel.getLabel());
-        this.rightFormPanel.getPanel().add(passwordField);
-        this.rightFormPanel.getPanel().add(connectButton.getButton());
-        this.rightFormPanel.getPanel().add(disconnectButton.getButton());
-        this.rightFormPanel.getPanel().add(connectionLabel.getLabel());
-        this.rightFormPanel.getPanel().add(connectionStatusLabel.getLabel());
-        this.rightFormPanel.getPanel().add(loginButton.getButton());
-        this.rightFormPanel.getPanel().add(logoutButton.getButton());
-        this.rightFormPanel.getPanel().add(loginLabel.getLabel());
-        this.rightFormPanel.getPanel().add(loginStatusLabel.getLabel());
+        rightFormPanel.getPanel().setPreferredSize(new Dimension(250, 10));
+        rightFormPanel.getPanel().setLayout(new GridLayout(6,2,5,5));
+        rightFormPanel.getPanel().add(usernameLabel.getLabel());
+        rightFormPanel.getPanel().add(usernameTextField.getTextField());
+        rightFormPanel.getPanel().add(passwordLabel.getLabel());
+        rightFormPanel.getPanel().add(passwordField);
+        rightFormPanel.getPanel().add(connectButton.getButton());
+        rightFormPanel.getPanel().add(disconnectButton.getButton());
+        rightFormPanel.getPanel().add(connectionLabel.getLabel());
+        rightFormPanel.getPanel().add(connectionStatusLabel.getLabel());
+        rightFormPanel.getPanel().add(loginButton.getButton());
+        rightFormPanel.getPanel().add(logoutButton.getButton());
+        rightFormPanel.getPanel().add(loginLabel.getLabel());
+        rightFormPanel.getPanel().add(loginStatusLabel.getLabel());
         loginStatusLabel.getLabel().setForeground(Color.RED);
         connectionStatusLabel.getLabel().setForeground(Color.red);
         connectButton.getButton().addActionListener(new RightPanel.ConnectButtonListener());
@@ -65,6 +65,11 @@ public class RightPanel extends SimplePanel{
         logoutButton.getButton().addActionListener(new RightPanel.LogoutButtonListener());
         logoutButton.getButton().setEnabled(false);
         panel.add(rightFormPanel.getPanel());
+        SimplePanel signupButtonHolderPanel = new SimplePanel();
+        signUpButton.getButton().addActionListener(new SignUpButtonListener());
+        signupButtonHolderPanel.getPanel().setLayout(new GridLayout(6,1));
+        signupButtonHolderPanel.getPanel().add(signUpButton.getButton());
+        panel.add(signupButtonHolderPanel.getPanel());
     }
     private class ConnectButtonListener implements ActionListener {
         @Override
@@ -118,6 +123,7 @@ public class RightPanel extends SimplePanel{
                 logoutButton.getButton().setEnabled(true);
                 connectButton.getButton().setEnabled(false);
                 leftPanel.setWatchlistButtonState(true);
+                signUpButton.getButton().setEnabled(false);
                 loginStatusLabel.getLabel().setForeground(Color.green);
                 loginStatusLabel.getLabel().setText("Logged in");
                 usernameTextField.getTextField().setEditable(false);
@@ -145,9 +151,24 @@ public class RightPanel extends SimplePanel{
                 loginStatusLabel.getLabel().setForeground(Color.red);
                 usernameTextField.getTextField().setEditable(true);
                 passwordField.setEditable(true);
+                signUpButton.getButton().setEnabled(true);
                 uiMainWindow.isConnected = true;
                 uiMainWindow.isLoggedIn = false;
                 uiMainWindow.leftPanel.deleteOldUserData();
+                uiMainWindow.centerPanel.getPanel().removeAll();
+                uiMainWindow.centerPanel.getPanel().revalidate();
+                uiMainWindow.centerPanel.getPanel().repaint();
+            }
+        }
+    }
+    private class SignUpButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(uiMainWindow.connection.sendSignupRequest(usernameTextField.getText(), getPassword())){
+                System.out.println("Signed up");
+            }else{
+                System.err.println("Could not signup");
             }
         }
     }

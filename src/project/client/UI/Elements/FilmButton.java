@@ -21,9 +21,10 @@ public class FilmButton extends SimpleButton {
         super("text");
         this.film = movie;
         this.centerPanel = centerPanel;
-        infoString = "<html><body><h2>"+movie.getTitle()+"</h2>"+
+
+        infoString = "<html><body><h2>"+FilmPanel.formatLongText(movie.getTitle())+"</h2>"+
                 "<p style=\"font-size:11px\">Genres: "+movie.getGenres()+"</p>"+
-                "<p style=\"font-size:11px\">Overview: "+ formatLongText()+"</p>"+
+                "<p style=\"font-size:11px\">Overview: "+ formatOverview()+"</p>"+
                 "<p>Rating: "+movie.getAvg_rating()+"</p></body></html>";
         button.setText(infoString);
         button.setHorizontalAlignment(SwingConstants.LEFT);
@@ -43,20 +44,20 @@ public class FilmButton extends SimpleButton {
             System.err.println("could not get image URL");
         }
     }
-    private String formatLongText(){
+    private String formatOverview(){
         String[] words = film.getOverview().split(" ");
         StringBuilder formatted = new StringBuilder();
         for(int i = 0; i < words.length; i++){
             if(i != 0 && i%10 == 0){
                 formatted.append("<br>");
             }
+            if(words.length < 20 && words[i].length() > 20){//insert endline for languages like japanese that don't have spaces
+                formatted.append("<br>");
+            }
             formatted.append(words[i]+" ");
         }
         this.film.setOverview(formatted.toString());
         return formatted.toString();
-    }
-    public Movie getFilm() {
-        return film;
     }
     private class on_film_button_click implements ActionListener{
 

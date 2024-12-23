@@ -48,7 +48,7 @@ public class FilmPanel extends SimplePanel {
         this.icon = icon;
 
 
-        infoString = "<html><body><div><h2>"+film.getTitle()+"</h2>"+
+        infoString = "<html><body><div><h2>"+formatLongText(film.getTitle())+"</h2>"+
                 "<p style=\"font-size:11px\">Genres: "+film.getGenres()+"</p>"+
                 "<p style=\"font-size:11px\">  Overview: "+film.getOverview()+"</p>"+
                 "<p>  Rating: "+film.getAvg_rating()+"</p></div></body></html>";
@@ -126,7 +126,7 @@ public class FilmPanel extends SimplePanel {
         SimpleLabel label = new SimpleLabel(htmlReview);
         reviewsPanel.getPanel().add(label.getLabel());
     }
-    private String formatLongText(String longText) {
+    public static String formatLongText(String longText) {
         String[] words = longText.split(" ");
         StringBuilder formatted = new StringBuilder();
         for(int i = 0; i < words.length; i++){

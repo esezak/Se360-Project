@@ -1,6 +1,5 @@
 package project.client;
 
-import com.client.UI.Elements.Panels.*;
 import project.client.UI.Elements.Panels.*;
 import project.client.UI.Elements.SimpleLabel;
 
@@ -46,7 +45,7 @@ public class UiMainWindow {
     private void setFrame(){
         frame = new JFrame();
         frame.setSize(1280, 720);
-        frame.setTitle("Client UI");
+        frame.setTitle("Movie Sync");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
